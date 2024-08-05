@@ -1,5 +1,5 @@
 import axios from "axios";
-import { changeGameStateAction, clearError, GameState, Message, Player, setCanvasDataAction, setError, setLoadedName, setMessagesAction, setMyId, setMyName, setPlayerList, setRoomLink, store } from "../store/store";
+import { changeGameStateAction, clearError, GameState, Message, Player, setCanvasDataAction, setError, setLoadedName, setMessagesAction, setMyId, setMyName, setPlayerList, setRoomLink, store, useAppSelector } from "../store/store";
 
 axios.defaults.baseURL = 'http://localhost:3000'
 axios.defaults.headers.common['Authorization'] = localStorage.getItem('authKey');
@@ -8,7 +8,7 @@ type Dispatch = typeof store.dispatch
 
 const LOGIN_URL = '/login'
 const CHANGE_NAME_URL = '/changeName'
-const SUBSCRIBE_URL = '/subscribe'
+const SUBSCRIBE_URL = `/subscribe/`
 const MESSAGE_URL = '/message'
 const CANVAS_URL = '/canvas'
 const FIND_GAME_URL = '/find-game'
@@ -71,7 +71,8 @@ export const findGame = () => {
 
 export const subscribe = async () => {
     try {
-        const { data: { event } } = await axios.get(SUBSCRIBE_URL)
+        const roomLink = store.getState().room.link
+        const { data: { event } } = await axios.get(SUBSCRIBE_URL + roomLink)
         switch (event) {
             case 'messagesChanged': {
                 const { data } = await axios.get('/messages')
@@ -91,16 +92,16 @@ export const subscribe = async () => {
                 store.dispatch(setCanvasDataAction(canvasData))
                 break
             }
-            default: await subscribe()
+            default: setTimeout(() => subscribe(), 2000)
         }
-        await subscribe()
+        //setTimeout(() => subscribe(), 2000)
     } catch (error: any) {
         console.log(error)
         if (error.response?.status === 401) {
             store.dispatch(changeGameStateAction(GameState.NotInGame))
             return
         }
-        await subscribe()
+        //setTimeout(() => subscribe(), 2000)
     }
 }
 

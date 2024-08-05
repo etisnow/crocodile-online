@@ -1,9 +1,9 @@
 import { useEffect } from 'react'
 
-import GameRoom from './pages/GameRoom.tsx'
 import LoginForm from './pages/LoginForm.tsx'
 import { selectInGame } from './store/selectors.tsx'
 import { useAppSelector } from './store/store.ts'
+import GameRoom from './pages/GameRoom.tsx'
 
 function App() {
     const inGame = useAppSelector(selectInGame)

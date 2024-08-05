@@ -77,19 +77,19 @@ app.get('/find-game', (req, res) => {
     res.json(roomLink)
 })
 
-app.get("/subscribe", (req, res) => {
-    const id = req.id
-    const player = room.playersList[id]
-    player.setActive()
-    emitter.once('subscribe', (event) => {
-        res.json({ event })
-        clearTimeout(reset)
-    })
-    const reset = setTimeout(() => {
-        emitter.emit('subscribe', 'subscribeReset')
-        console.log('subscribeReset', id);
-    }, 8000);
-    console.log(emitter.listeners('subscribe').length)
+app.get("/subscribe/:roomLink", (req, res) => {
+    const authKey = req.headers.authorization
+    const roomLink = req.params.roomLink
+    lobby.subscribe(authKey, roomLink)
+    // player.setActive()
+    // emitter.once('subscribe', (event) => {
+    //     res.json({ event })
+    //     clearTimeout(reset)
+    // })
+    // const reset = setTimeout(() => {
+    //     emitter.emit('subscribe', 'subscribeReset')
+    //     console.log('subscribeReset', id);
+    // }, 8000);
 });
 
 app.get('/messages', (req, res) => {

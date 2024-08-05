@@ -1,13 +1,10 @@
-import React, { useRef, useState, useEffect, MouseEvent } from 'react';
-import CanvasColors from './CanvasColors';
+import React, { MouseEvent, useEffect, useRef, useState } from 'react';
+import ClearIcon from '../../assets/clear.svg';
 import UndoIcon from '../../assets/undo.svg';
-import ClearIcon from '../../assets/clear.svg'
-import { Colors } from './CanvasColors';
-import { Thickness } from './CanvasThickness';
-import CanvasThickness from './CanvasThickness';
-import { ThicknessName } from './CanvasThickness';
-import CanvasHeader from './CanvasHeader';
 import { useAppDispatch } from '../../store/store';
+import CanvasColors, { Colors } from './CanvasColors';
+import CanvasHeader from './CanvasHeader';
+import CanvasThickness, { Thickness, ThicknessName } from './CanvasThickness';
 import { sendCanvasData } from '../../utils/requests';
 
 interface Point {
