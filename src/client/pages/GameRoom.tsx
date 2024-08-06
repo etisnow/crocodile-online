@@ -2,13 +2,13 @@ import { useEffect } from 'react'
 import Canvas from '../components/canvas/Canvas'
 import Console from '../components/console/Console'
 import SidePanel from '../components/sidePanel/SidePanel'
-import { subscribe } from '../utils/requests'
+import { connect } from '../utils/requests'
 
 
 function GameRoom() {
 
     useEffect(() => {
-        subscribe()
+        connect()
     }, [])
 
     return (

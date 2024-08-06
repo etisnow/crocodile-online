@@ -88,11 +88,25 @@ export class Lobby {
         return room.link
     }
 
-    subscribe(authKey, roomLink) {
+    connect(authKey, roomLink) {
         const player = this.players[authKey]
         const rooms = Object.values(this.rooms)
-        const room = rooms.find((room) => room.link = roomLink)
+        const room = rooms.find((room) => room.link === roomLink)
 
         console.log(player, room)
+    }
+
+    roomEvent(authKey, roomLink, event, payload) {
+        const player = this.players[authKey]
+        const rooms = Object.values(this.rooms)
+        const room = rooms.find((room) => room.link === roomLink)
+        rooms[room.id].makeEvent(player.id, event, payload)
+    }
+
+    getRoomData(roomLink) {
+        const rooms = Object.values(this.rooms)
+        const room = rooms.find((room) => room.link === roomLink)
+        const roomData = room.getRoomData()
+        return roomData
     }
 }

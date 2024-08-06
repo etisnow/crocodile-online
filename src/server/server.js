@@ -54,20 +54,22 @@ app.post("/changeName", (req, res) => {
     res.json(data)
 });
 
-app.post("/message", (req, res) => {
-    const message = req.body
-    room.messages.push(message)
+app.post("/message/:roomLink", (req, res) => {
+    const message = req.body.message
+    const authKey = req.headers.authorization
+    const roomLink = req.params.roomLink
     res.status(200)
     res.end('Message has arrived')
-    emitter.emit('subscribe', 'messagesChanged')
+    lobby.roomEvent(authKey, roomLink, 'message', message)
 });
 
-app.post("/canvas", (req, res) => {
-    const canvasData = req.body
-    room.canvasData = canvasData
+app.post("/canvas/:roomLink", (req, res) => {
+    const canvasData = req.body.canvasData
+    const roomLink = req.params.roomLink
+    const authKey = req.headers.authorization
     res.status(200)
     res.end('Canvas has arrived')
-    emitter.emit('subscribe', 'canvasChanged')
+    lobby.roomEvent(authKey, roomLink, 'canvas', canvasData)
 });
 
 
@@ -77,37 +79,25 @@ app.get('/find-game', (req, res) => {
     res.json(roomLink)
 })
 
-app.get("/subscribe/:roomLink", (req, res) => {
+
+app.get("/connect/:roomLink", (req, res) => {
     const authKey = req.headers.authorization
     const roomLink = req.params.roomLink
-    lobby.subscribe(authKey, roomLink)
-    // player.setActive()
-    // emitter.once('subscribe', (event) => {
-    //     res.json({ event })
-    //     clearTimeout(reset)
-    // })
-    // const reset = setTimeout(() => {
-    //     emitter.emit('subscribe', 'subscribeReset')
-    //     console.log('subscribeReset', id);
-    // }, 8000);
+    res.writeHead(200, {
+        'Connection': 'keep-alive',
+        'Content-Type': 'text/event-stream',
+        'Cache-control': 'no-cache'
+    })
+    const roomInfo = lobby.getRoomData(roomLink)
+    res.write(`data: ${JSON.stringify(roomInfo)} \n\n`)
+    emitter.on('room-event' + roomLink, (data) => {
+        res.write(`data: ${JSON.stringify(data)} \n\n`)
+    })
+    req.on("close", () => {
+        console.log('connection closed');
+
+    });
 });
-
-app.get('/messages', (req, res) => {
-    const messages = room.messages
-    res.json(messages)
-})
-
-app.get('/players', (req, res) => {
-    const playersList = Object.values(room.playersList).filter((player) => player.isActive)
-    res.json(playersList)
-})
-
-app.get('/canvas', (req, res) => {
-    const canvasData = room.canvasData
-    res.send(canvasData)
-})
-
-
 
 
 server.listen(PORT, 'localhost', error => {

@@ -1,5 +1,5 @@
 import axios from "axios";
-import { changeGameStateAction, clearError, GameState, Message, Player, setCanvasDataAction, setError, setLoadedName, setMessagesAction, setMyId, setMyName, setPlayerList, setRoomLink, store, useAppSelector } from "../store/store";
+import { changeGameStateAction, clearError, GameState, setCanvasDataAction, setError, setLoadedName, setMessagesAction, setMyId, setMyName, setPlayerList, setRoomLink, store } from "../store/store";
 
 axios.defaults.baseURL = 'http://localhost:3000'
 axios.defaults.headers.common['Authorization'] = localStorage.getItem('authKey');
@@ -8,10 +8,15 @@ type Dispatch = typeof store.dispatch
 
 const LOGIN_URL = '/login'
 const CHANGE_NAME_URL = '/changeName'
-const SUBSCRIBE_URL = `/subscribe/`
+const CONNECT_URL = `/connect`
 const MESSAGE_URL = '/message'
 const CANVAS_URL = '/canvas'
 const FIND_GAME_URL = '/find-game'
+
+const formRoomLink = (endPoint: string) => {
+    const roomLink = window.location.pathname
+    return axios.defaults.baseURL + endPoint + roomLink
+}
 
 export const login = () => {
     return async (dispatch: Dispatch) => {
@@ -58,8 +63,6 @@ export const findGame = () => {
             const response = await axios.get(FIND_GAME_URL)
             const roomLink = response.data
             dispatch(setRoomLink(roomLink))
-            console.log(roomLink);
-
             dispatch(clearError())
         } catch (error: any) {
             const response = error.response.data.error
@@ -69,46 +72,29 @@ export const findGame = () => {
     }
 }
 
-export const subscribe = async () => {
+export const connect = async () => {
     try {
-        const roomLink = store.getState().room.link
-        const { data: { event } } = await axios.get(SUBSCRIBE_URL + roomLink)
-        switch (event) {
-            case 'messagesChanged': {
-                const { data } = await axios.get('/messages')
-                const messages: Message[] = data
-                store.dispatch(setMessagesAction(messages))
-                break
-            }
-            case 'playersChanged': {
-                const { data } = await axios.get('/players')
-                const players: Player[] = data
-                store.dispatch(setPlayerList(players))
-                break
-            }
-            case 'canvasChanged': {
-                const response = await axios.get('/canvas')
-                const canvasData: string = response.data.canvasData
-                store.dispatch(setCanvasDataAction(canvasData))
-                break
-            }
-            default: setTimeout(() => subscribe(), 2000)
+        const eventSource = new EventSource(formRoomLink(CONNECT_URL))
+        eventSource.onmessage = (event) => {
+            const data = JSON.parse(event.data)
+            store.dispatch(setPlayerList(data.players))
+            store.dispatch(setMessagesAction(data.messages))
+            store.dispatch(setCanvasDataAction(data.canvasData))
         }
-        //setTimeout(() => subscribe(), 2000)
+
     } catch (error: any) {
         console.log(error)
         if (error.response?.status === 401) {
             store.dispatch(changeGameStateAction(GameState.NotInGame))
             return
         }
-        //setTimeout(() => subscribe(), 2000)
     }
 }
 
-export const sendMessage = (message: Message) => {
+export const sendMessage = (message: string) => {
     return async (dispatch: Dispatch) => {
         try {
-            await axios.post(MESSAGE_URL, message)
+            await axios.post(formRoomLink(MESSAGE_URL), { message })
         } catch (error) {
             console.log(error, 'error');
             dispatch(setError(error as string))
@@ -121,7 +107,7 @@ export const sendCanvasData = (canvasData: string | undefined) => {
         console.log(typeof canvasData);
 
         try {
-            await axios.post(CANVAS_URL, { canvasData })
+            await axios.post(formRoomLink(CANVAS_URL), { canvasData })
         } catch (error) {
             console.log(error, 'error');
             dispatch(setError(error as string))

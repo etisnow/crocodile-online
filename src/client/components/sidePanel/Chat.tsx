@@ -1,5 +1,4 @@
 import { KeyboardEvent, useEffect, useRef, useState } from "react"
-import { selectSelfPlayerData } from "../../store/selectors"
 import { useAppDispatch, useAppSelector } from "../../store/store"
 import { sendMessage } from "../../utils/requests"
 
@@ -9,7 +8,7 @@ const Chat = () => {
     const messageList = useAppSelector((state) => state.room.messages)
     const [inputValue, setInputValue] = useState('')
     const inputRef = useRef<HTMLInputElement>(null)
-    const myPlayerData = useAppSelector(selectSelfPlayerData)
+    const myPlayerData = useAppSelector((state) => state.player);
     const dispatch = useAppDispatch()
 
     useEffect(() => {
@@ -22,11 +21,11 @@ const Chat = () => {
 
     const addMessage = (text: string) => {
         if (!text) return
-        const message = { authorId: myPlayerData.id, authorName: myPlayerData.name, body: text }
-        // dispatch(addMessageAction(message))
-        setInputValue('')
-        inputRef.current?.focus()
-        dispatch(sendMessage(message))
+        if (myPlayerData.id !== null) {
+            setInputValue('')
+            inputRef.current?.focus()
+            dispatch(sendMessage(text))
+        }
     }
 
     const sentMessageByEnter = (e: KeyboardEvent) => {
