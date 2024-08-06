@@ -5,7 +5,7 @@ export class Room {
     players = {}
     playerIds = []
     messages = []
-    canvasData = ''
+    canvasData = 'data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw=='
 
     constructor(id, link, host) {
         this.id = id

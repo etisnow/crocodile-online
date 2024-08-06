@@ -1,5 +1,6 @@
 import axios from "axios";
 import { changeGameStateAction, clearError, GameState, setCanvasDataAction, setError, setLoadedName, setMessagesAction, setMyId, setMyName, setPlayerList, setRoomLink, store } from "../store/store";
+import { useNavigate } from "react-router-dom";
 
 axios.defaults.baseURL = 'http://localhost:3000'
 axios.defaults.headers.common['Authorization'] = localStorage.getItem('authKey');
@@ -73,21 +74,19 @@ export const findGame = () => {
 }
 
 export const connect = async () => {
-    try {
-        const eventSource = new EventSource(formRoomLink(CONNECT_URL))
-        eventSource.onmessage = (event) => {
-            const data = JSON.parse(event.data)
-            store.dispatch(setPlayerList(data.players))
-            store.dispatch(setMessagesAction(data.messages))
-            store.dispatch(setCanvasDataAction(data.canvasData))
-        }
-
-    } catch (error: any) {
-        console.log(error)
-        if (error.response?.status === 401) {
-            store.dispatch(changeGameStateAction(GameState.NotInGame))
-            return
-        }
+    const eventSource = new EventSource(formRoomLink(CONNECT_URL))
+    eventSource.onerror = (e) => {
+        console.log(e)
+        store.dispatch(changeGameStateAction(GameState.NotInGame))
+        eventSource.close()
+        return
+    }
+    eventSource.onmessage = (event) => {
+        store.dispatch(changeGameStateAction(GameState.Pending))
+        const data = JSON.parse(event.data)
+        store.dispatch(setPlayerList(data.players))
+        store.dispatch(setMessagesAction(data.messages))
+        store.dispatch(setCanvasDataAction(data.canvasData))
     }
 }
 
