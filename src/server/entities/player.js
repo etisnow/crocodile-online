@@ -6,7 +6,6 @@ export class Player {
     constructor(id, name, roomId = null) {
         this.id = id
         this.name = name
-        this.roomId = roomId
         this.isActive = true
         console.log('new player constructed');
     }
@@ -23,10 +22,6 @@ export class Player {
     toJSON() {
         const { id, name, score } = this
         return { id, name, score }
-    }
-
-    moveToRoom(roomId) {
-        this.roomId = roomId
     }
 
 }

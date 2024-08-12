@@ -1,6 +1,6 @@
 import axios from "axios";
-import { changeGameStateAction, clearError, GameState, setCanvasDataAction, setError, setLoadedName, setMessagesAction, setMyId, setMyName, setPlayerList, setRoomLink, store } from "../store/store";
-import { useNavigate } from "react-router-dom";
+import EventSource from "eventsource";
+import { clearError, setError, setLoadedName, setMyName, setPlayerData, setRoomData, setRoomLink, store } from "../store/store";
 
 axios.defaults.baseURL = 'http://localhost:3000'
 axios.defaults.headers.common['Authorization'] = localStorage.getItem('authKey');
@@ -28,14 +28,13 @@ export const login = () => {
             axios.defaults.headers.common['Authorization'] = localStorage.getItem('authKey')
             const id = response.data.player.id
             const name = response.data.player.name
-            dispatch(setMyId(id))
-            dispatch(setMyName(name))
-            dispatch(setLoadedName(name))
-            dispatch(clearError())
+            dispatch(setPlayerData({ id, name, preloadedName: name, isLogged: true }))
         } catch (error: any) {
-            const response = error.response.data.error
             console.log(error, 'error');
-            dispatch(setError(response as string))
+            dispatch(setError('Ошибка авторизации'))
+            setTimeout(() => {
+                login()
+            }, 2000)
         }
     }
 }
@@ -53,7 +52,7 @@ export const changeName = (name: string) => {
         } catch (error: any) {
             const response = error.response.data.error
             console.log(error, 'error');
-            dispatch(setError(response as string))
+            dispatch(setError('Ошибка авторизации'))
         }
     }
 }
@@ -73,21 +72,25 @@ export const findGame = () => {
     }
 }
 
-export const connect = async () => {
-    const eventSource = new EventSource(formRoomLink(CONNECT_URL))
-    eventSource.onerror = (e) => {
+export const connect = () => {
+    const eventSource = new EventSource(formRoomLink(CONNECT_URL), {
+        headers: { 'Authorization': localStorage.getItem('authKey') }
+    })
+    eventSource.onerror = (e: any) => {
         console.log(e)
-        store.dispatch(changeGameStateAction(GameState.NotInGame))
+        store.dispatch(setError('Ошибка соединения'))
+        store.dispatch(setRoomLink(''))
         eventSource.close()
-        return
     }
-    eventSource.onmessage = (event) => {
-        store.dispatch(changeGameStateAction(GameState.Pending))
+    eventSource.onmessage = (event: any) => {
         const data = JSON.parse(event.data)
-        store.dispatch(setPlayerList(data.players))
-        store.dispatch(setMessagesAction(data.messages))
-        store.dispatch(setCanvasDataAction(data.canvasData))
+        store.dispatch(setRoomData(data))
     }
+    window.addEventListener('unload', () => {
+        eventSource.close();
+        console.log('Соединение EventSource закрыто.');
+    });
+    return eventSource
 }
 
 export const sendMessage = (message: string) => {
@@ -103,13 +106,11 @@ export const sendMessage = (message: string) => {
 
 export const sendCanvasData = (canvasData: string | undefined) => {
     return async (dispatch: Dispatch) => {
-        console.log(typeof canvasData);
-
         try {
             await axios.post(formRoomLink(CANVAS_URL), { canvasData })
         } catch (error) {
             console.log(error, 'error');
-            dispatch(setError(error as string))
+            dispatch(setError('Ошибка соединения'))
         }
     }
 }

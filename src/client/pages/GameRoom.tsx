@@ -1,26 +1,32 @@
 import { useEffect } from 'react'
+import { useNavigate } from 'react-router-dom'
 import Canvas from '../components/canvas/Canvas'
 import Console from '../components/console/Console'
 import SidePanel from '../components/sidePanel/SidePanel'
-import { connect } from '../utils/requests'
-import { GameState, useAppSelector } from '../store/store'
-import { useNavigate } from 'react-router-dom'
+import { useAppDispatch, useAppSelector } from '../store/store'
+import { connect, login } from '../utils/requests'
 
 
 function GameRoom() {
-
-    const gameState = useAppSelector((state)=> state.room.gameState)
+    const isLogged = useAppSelector((state) => state.player.isLogged)
+    const error = useAppSelector((state) => state.error)
     const navigate = useNavigate()
+    const dispatch = useAppDispatch()
 
     useEffect(() => {
-        connect()
+        if (!isLogged) {
+            dispatch(login())
+        }
+        const eventSource = connect()
+
+        return () => eventSource.close()
     }, [])
 
-    useEffect(()=> {
-        if (gameState === GameState.NotInGame) {
+    useEffect(() => {
+        if (error) {
             navigate('/')
         }
-    }, [gameState])
+    }, [error])
 
     return (
 

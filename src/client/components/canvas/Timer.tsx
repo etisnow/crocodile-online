@@ -1,33 +1,32 @@
-import { useEffect } from "react"
-import { GameState, setTimerAction, timerTickAction, useAppDispatch, useAppSelector } from "../../store/store"
+import { useEffect, useState } from "react"
+import { useAppDispatch, useAppSelector } from "../../store/store"
 
 const Timer = () => {
     const dispatch = useAppDispatch()
-    const timer = useAppSelector((state) => state.room.timer)
+    // const timer = useAppSelector((state) => state.room.timer)
+    const timerServerStamp = useAppSelector((state) => state.room.timerServerStamp)
     const gameState = useAppSelector((state) => state.room.gameState)
+    const [timer, setTimer] = useState(0)
 
-    const minutes = Math.floor(timer / 60)
-    const seconds = timer % 60;
+    const minutes = Math.floor(timer / 60 / 1000)
+    const seconds = Math.floor(timer / 1000)
 
 
     useEffect(() => {
-        let timerInterval: number;
-        if (gameState === GameState.Painting) {
-            let internalCounter = timer;
-            timerInterval = setInterval(() => {
-                if (internalCounter > 0) {
-                    dispatch(timerTickAction());
-                    --internalCounter
-                } else {
-                    clearInterval(timerInterval)
-                }
-            }, 1000);
-        }
+        setTimer(timerServerStamp)
+        let internalCounter = timerServerStamp;
+        let timerInterval = setInterval(() => {
+            if (internalCounter > 0) {
+                setTimer((prev) => prev - 1000)
+                internalCounter -= 1000
+            } else {
+                clearInterval(timerInterval)
+            }
+        }, 1000);
         return () => {
             clearInterval(timerInterval);
-            dispatch(setTimerAction(120))
         }
-    }, [gameState]);
+    }, [timerServerStamp]);
 
 
     return (

@@ -1,4 +1,4 @@
-import { createAppSelector, GameState } from "./store";
+import { createAppSelector } from "./store";
 
 export const selectAmIPainter = createAppSelector(
     [
@@ -14,6 +14,6 @@ export const selectCanvasData = createAppSelector(
 )
 
 export const selectInGame = createAppSelector(
-    [(state) => state.room.gameState],
-    (gameState) => gameState != GameState.NotInGame
+    [(state) => state.room.link],
+    (link) => link != ''
 )

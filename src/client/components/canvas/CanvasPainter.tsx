@@ -2,10 +2,10 @@ import React, { MouseEvent, useEffect, useRef, useState } from 'react';
 import ClearIcon from '../../assets/clear.svg';
 import UndoIcon from '../../assets/undo.svg';
 import { useAppDispatch } from '../../store/store';
+import { sendCanvasData } from '../../utils/requests';
 import CanvasColors, { Colors } from './CanvasColors';
 import CanvasHeader from './CanvasHeader';
 import CanvasThickness, { Thickness, ThicknessName } from './CanvasThickness';
-import { sendCanvasData } from '../../utils/requests';
 
 interface Point {
     x: number;
@@ -26,8 +26,18 @@ const CanvasPainter: React.FC = () => {
     const [lines, setLines] = useState<Line[]>([]);
     const [activeColor, setActiveColor] = useState<Colors>(Colors.black);
     const [activeThickness, setActiveThickness] = useState<ThicknessName>('normal')
+    const throttleInProgress = useRef(false)
 
     const dispatch = useAppDispatch()
+    const sendCanvasThrottled = () => {
+        if (throttleInProgress.current) { return; }
+        throttleInProgress.current = true;
+        setTimeout(() => {
+            const canvas = canvasRef.current;
+            dispatch(sendCanvasData(canvas?.toDataURL()))
+            throttleInProgress.current = false;
+        }, 300);
+    }
 
     useEffect(() => {
         function undoHandler(event: KeyboardEvent): void {
@@ -64,10 +74,9 @@ const CanvasPainter: React.FC = () => {
                     }
                     context.stroke();
                 });
-
+                sendCanvasThrottled()
             }
         }
-        dispatch(sendCanvasData(canvas?.toDataURL()))
     }, [lines]);
 
     const startDrawing = ({ nativeEvent }: MouseEvent<HTMLCanvasElement>) => {
@@ -100,12 +109,18 @@ const CanvasPainter: React.FC = () => {
         setLines([]);
     }
 
+    const handleMouseDown = (e: MouseEvent<HTMLCanvasElement>) => {
+        if (e.button === 0) {
+            startDrawing(e)
+        }
+    }
+
     return (
         <div className='canvas-container shadowed-block'>
             <CanvasHeader />
             <canvas
                 ref={canvasRef}
-                onMouseDown={startDrawing}
+                onMouseDown={handleMouseDown}
                 onMouseMove={draw}
                 onMouseUp={finishDrawing}
                 onMouseLeave={finishDrawing}

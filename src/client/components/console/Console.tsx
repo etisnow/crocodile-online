@@ -1,5 +1,5 @@
 import { selectAmIPainter } from "../../store/selectors"
-import { changeCurrentPainterIdAction, changeGameStateAction, GameState, useAppDispatch, useAppSelector } from "../../store/store"
+import { changeGameStateAction, GameState, useAppDispatch, useAppSelector } from "../../store/store"
 
 const Console = () => {
     const dispatch = useAppDispatch()
@@ -22,14 +22,6 @@ const Console = () => {
                 {
                     Object.keys(GameState).map((state, i) =>
                         <option key={i}>{state}</option>
-                    )
-                }
-            </select>
-            <div>ChangeCurrentPlayer</div>
-            <select onChange={(e) => dispatch(changeCurrentPainterIdAction(+e.target.value))}>
-                {
-                    playerList.map((player, i) =>
-                        <option key={i} value={player.id}>{player.name}</option>
                     )
                 }
             </select>

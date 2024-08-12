@@ -75,6 +75,15 @@ app.post("/canvas/:roomLink", (req, res) => {
 
 app.get('/find-game', (req, res) => {
     const authKey = req.headers.authorization
+    const nameValidation = lobby.validateName(authKey)
+    console.log(nameValidation);
+
+    if (nameValidation.error) {
+        res.status(400)
+        res.json(nameValidation)
+        res.end()
+        return
+    }
     const roomLink = lobby.findGame(authKey)
     res.json(roomLink)
 })
@@ -88,15 +97,16 @@ app.get("/connect/:roomLink", (req, res) => {
         'Content-Type': 'text/event-stream',
         'Cache-control': 'no-cache'
     })
-    const roomInfo = lobby.getRoomData(roomLink)
+    const roomInfo = lobby.enterRoom(authKey, roomLink)
     res.write(`data: ${JSON.stringify(roomInfo)} \n\n`)
     emitter.on('room-event' + roomLink, (data) => {
         res.write(`data: ${JSON.stringify(data)} \n\n`)
     })
     req.on("close", () => {
         console.log('connection closed');
-
+        lobby.disconnect(authKey, roomLink)
     });
+    console.log(emitter.listenerCount());
 });
 
 

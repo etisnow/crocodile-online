@@ -1,16 +1,11 @@
-
 import { configureStore, createAction, createReducer, createSelector } from '@reduxjs/toolkit'
 import { useDispatch, useSelector, useStore } from 'react-redux'
 
 type State = {
-    player: {
-        id: number | null,
-        name: string,
-        preloadedName: string
-    },
+    player: Player,
     room: {
         link: string,
-        playerList: Player[],
+        playerList: RoomPlayer[],
         messages: Message[],
         currentWord: string,
         currentPainterId: number,
@@ -23,6 +18,13 @@ type State = {
 }
 
 export interface Player {
+    id: number | null,
+    name: string,
+    preloadedName: string,
+    isLogged: boolean
+}
+
+export interface RoomPlayer {
     id: number,
     name: string,
     score: number
@@ -36,6 +38,7 @@ export interface Message {
 
 export enum GameState {
     NotInGame = 'NotInGame',
+    WaintingForPlayers = 'WaintingForPlayers',
     Pending = 'Pending',
     StartOfTurn = 'StartOfTurn',
     Painting = 'Painting',
@@ -56,37 +59,41 @@ export enum Actions {
     SetCanvasData = 'SetCanvasData'
 }
 
-export const addMessageAction = createAction<{ authorId: number, authorName: string, body: string }>(Actions.AddMessage)
-export const setMessagesAction = createAction<{ authorId: number, authorName: string, body: string }[]>(Actions.SetMessages)
-export const timerTickAction = createAction(Actions.TickTimer)
 export const changeGameStateAction = createAction<GameState>(Actions.ChangeGameState)
 export const setTimerAction = createAction<number>(Actions.SetTimer)
-export const changeCurrentPainterIdAction = createAction<number>(Actions.ChangeCurrentPainterId)
-export const setCanvasDataAction = createAction<string>(Actions.SetCanvasData)
-export const setPlayerList = createAction<Player[]>(Actions.SetPlayerList)
+export const setRoomData = createAction<{
+    players: RoomPlayer[],
+    messages: Message[],
+    gameState: GameState,
+    currentPainterId: number,
+    currentWord: string,
+    timer: number,
+    canvasData: string
+}>('room/setRoomData')
 
 export const setError = createAction<string>('error/set')
 export const clearError = createAction('error/clear')
 
+export const setPlayerData = createAction<Player>('player/setData')
 export const setMyId = createAction<number>('player/setMyId')
 export const setMyName = createAction<string>('player/setMyName')
 export const setLoadedName = createAction<string>('player/setLoadedName')
-
 export const setRoomLink = createAction<string>('room/setLink')
 
 const initialState: State = {
     player: {
         id: null,
         name: '',
-        preloadedName: ''
+        preloadedName: '',
+        isLogged: false
     },
     room: {
         link: '',
         playerList: [],
         messages: [],
-        currentWord: 'Похмелье',
-        currentPainterId: 1,
-        timerServerStamp: Date.now(),
+        currentWord: '',
+        currentPainterId: -1,
+        timerServerStamp: 0,
         timer: 120,
         gameState: GameState.NotInGame,
         canvasData: 'data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw=='
@@ -96,36 +103,17 @@ const initialState: State = {
 
 const reducer = createReducer(initialState, (builder) => {
     builder
-        .addCase(setPlayerList, (state, action) => {
-            state.room.playerList = action.payload
-        })
-        .addCase(addMessageAction, (state, action) => {
-            state.room.messages.push({
-                authorId: action.payload.authorId,
-                authorName: action.payload.authorName,
-                body: action.payload.body
-            })
-        })
-        .addCase(setMessagesAction, (state, action) => {
-            state.room.messages = action.payload
-        })
-        .addCase(timerTickAction, (state) => {
-            state.room.timer = state.room.timer - 1
-        })
         .addCase(changeGameStateAction, (state, action) => {
             state.room.gameState = action.payload
         })
         .addCase(setTimerAction, (state, action) => {
             state.room.timer = action.payload
         })
-        .addCase(changeCurrentPainterIdAction, (state, action) => {
-            state.room.currentPainterId = action.payload
-        })
-        .addCase(setCanvasDataAction, (state, action) => {
-            state.room.canvasData = action.payload
-        })
         .addCase(setError, (state, action) => {
             state.error = action.payload
+        })
+        .addCase(clearError, (state, action) => {
+            state.error = ''
         })
         .addCase(setMyId, (state, action) => {
             state.player.id = action.payload
@@ -138,6 +126,19 @@ const reducer = createReducer(initialState, (builder) => {
         })
         .addCase(setRoomLink, (state, action) => {
             state.room.link = action.payload
+        })
+        .addCase(setPlayerData, (state, action) => {
+            state.player = action.payload
+        })
+        .addCase(setRoomData, (state, action) => {
+            const { players, messages, gameState, currentPainterId, currentWord, canvasData, timer } = action.payload
+            state.room.playerList = players
+            state.room.messages = messages
+            state.room.gameState = gameState
+            state.room.currentPainterId = currentPainterId
+            state.room.currentWord = currentWord
+            state.room.canvasData = canvasData
+            state.room.timerServerStamp = timer
         })
 })
 

@@ -34,15 +34,28 @@ const Chat = () => {
         }
     }
 
+    const messageOutput = messageList.map((message, i) => {
+        if (message.authorId === -1) {
+            return (
+                <div className="chat-message-system" key={i}>
+                    <span className="chat-message-author">{message.authorName} </span>
+                    <span className="chat-message-body">{message.body}</span>
+                </div>
+            )
+        } else {
+            return (
+                <div className="chat-message" key={i}>
+                    <span className="chat-message-author">{message.authorName}: </span>
+                    <span className="chat-message-body">{message.body}</span>
+                </div>
+            )
+        }
+    })
+
     return (
         <div className='chat-container'>
             <div className='chat-messages'>
-                {messageList.map((message, i) =>
-                    <div className="chat-message" key={i}>
-                        <span className="chat-message-author">{message.authorName}: </span>
-                        <span className="chat-message-body">{message.body}</span>
-                    </div>
-                )}
+                {messageOutput}
             </div>
             <div className='chat-form'>
                 <input

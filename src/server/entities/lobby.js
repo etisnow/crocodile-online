@@ -67,6 +67,16 @@ export class Lobby {
         return { player }
     }
 
+    validateName(authKey) {
+        const name = this.players[authKey].name
+        if (name.length < 3) {
+            return { error: 'Имя должно быть не меньше 3х символов' }
+        }
+        if (name.length > 10) {
+            return { error: 'Имя должно не должно быть длиннее 10 символов' }
+        }
+        return { error: '' }
+    }
 
     findGame(authKey) {
         const player = this.players[authKey]
@@ -76,24 +86,19 @@ export class Lobby {
         if (roomId === null) {
             roomId = this.startNewRoom(player)
         }
-        player.moveToRoom(roomId)
 
         const room = this.rooms[roomId]
-        room.addPlayer(player)
-
-        //console.log(this.rooms);
-        //console.log(this.roomIds);
-
 
         return room.link
     }
 
-    connect(authKey, roomLink) {
+    disconnect(authKey, roomLink) {
         const player = this.players[authKey]
+        console.log(this.players); console.log(authKey);
+
         const rooms = Object.values(this.rooms)
         const room = rooms.find((room) => room.link === roomLink)
-
-        console.log(player, room)
+        room.moveToDisconnected(player)
     }
 
     roomEvent(authKey, roomLink, event, payload) {
@@ -108,5 +113,13 @@ export class Lobby {
         const room = rooms.find((room) => room.link === roomLink)
         const roomData = room.getRoomData()
         return roomData
+    }
+
+    enterRoom(authKey, roomLink) {
+        const rooms = Object.values(this.rooms)
+        const room = rooms.find((room) => room.link === roomLink)
+        const player = this.players[authKey]
+        room.connectPlayer(player)
+        return room.getRoomData()
     }
 }
