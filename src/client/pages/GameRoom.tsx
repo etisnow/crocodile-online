@@ -3,24 +3,38 @@ import { useNavigate } from 'react-router-dom'
 import Canvas from '../components/canvas/Canvas'
 import Console from '../components/console/Console'
 import SidePanel from '../components/sidePanel/SidePanel'
-import { useAppDispatch, useAppSelector } from '../store/store'
-import { connect, login } from '../utils/requests'
+import { RoomValidationStatus, useAppDispatch, useAppSelector } from '../store/store'
+import { connect, enterRoom, login } from '../utils/requests'
+import EnterRoom from './EnterRoom'
 
 
 function GameRoom() {
     const isLogged = useAppSelector((state) => state.player.isLogged)
     const error = useAppSelector((state) => state.error)
+    const roomValidation = useAppSelector((state) => state.room.validation)
     const navigate = useNavigate()
     const dispatch = useAppDispatch()
 
     useEffect(() => {
         if (!isLogged) {
             dispatch(login())
+        } else {
+            dispatch(enterRoom())
         }
-        const eventSource = connect()
+    }, [isLogged])
 
-        return () => eventSource.close()
-    }, [])
+    useEffect(() => {
+        let eventSource: any
+        if (roomValidation === RoomValidationStatus.Sucsess) {
+            eventSource = connect()
+        }
+
+        return () => {
+            if (roomValidation === RoomValidationStatus.Sucsess) {
+                eventSource.close()
+            }
+        }
+    }, [roomValidation])
 
     useEffect(() => {
         if (error) {
@@ -29,14 +43,17 @@ function GameRoom() {
     }, [error])
 
     return (
-
-        <div className='main-container'>
-            <div className='game-container'>
-                <Canvas />
-                <SidePanel />
-                <Console />
+        (roomValidation === RoomValidationStatus.Error)
+            ?
+            <EnterRoom />
+            :
+            <div className='main-container'>
+                <div className='game-container'>
+                    <Canvas />
+                    <SidePanel />
+                    <Console />
+                </div>
             </div>
-        </div>
     )
 }
 

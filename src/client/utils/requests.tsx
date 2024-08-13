@@ -1,6 +1,6 @@
 import axios from "axios";
 import EventSource from "eventsource";
-import { clearError, setError, setLoadedName, setMyName, setPlayerData, setRoomData, setRoomLink, store } from "../store/store";
+import { clearError, RoomValidationStatus, setError, setLoadedName, setMyName, setPlayerData, setRoomData, setRoomLink, setRoomValidation, store } from "../store/store";
 
 axios.defaults.baseURL = 'http://localhost:3000'
 axios.defaults.headers.common['Authorization'] = localStorage.getItem('authKey');
@@ -13,6 +13,7 @@ const CONNECT_URL = `/connect`
 const MESSAGE_URL = '/message'
 const CANVAS_URL = '/canvas'
 const FIND_GAME_URL = '/find-game'
+const ENTER_ROOM_URL = '/enter-room'
 
 const formRoomLink = (endPoint: string) => {
     const roomLink = window.location.pathname
@@ -68,6 +69,23 @@ export const findGame = () => {
             const response = error.response.data.error
             console.log(error, 'error');
             dispatch(setError(response as string))
+        }
+    }
+}
+
+export const enterRoom = () => {
+    return async (dispatch: Dispatch) => {
+        try {
+            dispatch(setRoomValidation(RoomValidationStatus.Pending))
+            await axios.get(formRoomLink(ENTER_ROOM_URL))
+            dispatch(setRoomValidation(RoomValidationStatus.Sucsess))
+            dispatch(clearError())
+            console.log('Room Entered');
+        } catch (error: any) {
+            const response = error.response.data.error
+            console.log(error)
+            dispatch(setRoomValidation(RoomValidationStatus.Error))
+            //dispatch(setError(response))
         }
     }
 }

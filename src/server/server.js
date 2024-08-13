@@ -88,6 +88,30 @@ app.get('/find-game', (req, res) => {
     res.json(roomLink)
 })
 
+app.get('/enter-room/:roomLink', (req, res) => {
+    const authKey = req.headers.authorization
+    const nameValidation = lobby.validateName(authKey)
+    if (nameValidation.error) {
+        res.status(400)
+        res.json(nameValidation)
+        res.end()
+        return
+    }
+
+    const roomLink = req.params.roomLink
+    const roomValidation = lobby.validateRoom(roomLink)
+    if (roomValidation.error) {
+        res.status(400)
+        res.json(roomValidation)
+        res.end()
+        return
+    }
+
+    res.status(200)
+    res.end()
+    console.log('room validated');
+
+})
 
 app.get("/connect/:roomLink", (req, res) => {
     const authKey = req.headers.authorization

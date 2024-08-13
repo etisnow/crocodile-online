@@ -1,9 +1,10 @@
-import { configureStore, createAction, createReducer, createSelector } from '@reduxjs/toolkit'
-import { useDispatch, useSelector, useStore } from 'react-redux'
+import { configureStore, createAction, createReducer, createSelector } from '@reduxjs/toolkit';
+import { useDispatch, useSelector, useStore } from 'react-redux';
 
 type State = {
     player: Player,
     room: {
+        validation: RoomValidationStatus,
         link: string,
         playerList: RoomPlayer[],
         messages: Message[],
@@ -13,7 +14,7 @@ type State = {
         timer: number,
         gameState: GameState,
         canvasData: string
-    }
+    },
     error: string
 }
 
@@ -46,21 +47,15 @@ export enum GameState {
     EndOfGame = 'EndOfGame'
 }
 
-export enum Actions {
-    SetPlayerList = 'SetPlayerList',
-    AddMessage = 'AddMessage',
-    SetMessages = 'setMessages',
-    ChangeCurrentWord = 'ChangeCurrentWord',
-    ChangeCurrentPainterId = 'ChangeCurrentPainter',
-    NewTimerServerStamp = 'NewTimerServerStamp',
-    TickTimer = 'TickTimer',
-    SetTimer = 'SetTimer',
-    ChangeGameState = 'ChangeGameState',
-    SetCanvasData = 'SetCanvasData'
+export enum RoomValidationStatus {
+    Empty = 'Empty',
+    Pending = 'Pending',
+    Sucsess = 'Sucsess',
+    Error = 'Error'
 }
 
-export const changeGameStateAction = createAction<GameState>(Actions.ChangeGameState)
-export const setTimerAction = createAction<number>(Actions.SetTimer)
+export const changeGameStateAction = createAction<GameState>('room/setGameState')
+export const setTimerAction = createAction<number>('room/setTimer')
 export const setRoomData = createAction<{
     players: RoomPlayer[],
     messages: Message[],
@@ -79,6 +74,7 @@ export const setMyId = createAction<number>('player/setMyId')
 export const setMyName = createAction<string>('player/setMyName')
 export const setLoadedName = createAction<string>('player/setLoadedName')
 export const setRoomLink = createAction<string>('room/setLink')
+export const setRoomValidation = createAction<RoomValidationStatus>('room/setValidation')
 
 const initialState: State = {
     player: {
@@ -88,6 +84,7 @@ const initialState: State = {
         isLogged: false
     },
     room: {
+        validation: RoomValidationStatus.Empty,
         link: '',
         playerList: [],
         messages: [],
@@ -126,6 +123,9 @@ const reducer = createReducer(initialState, (builder) => {
         })
         .addCase(setRoomLink, (state, action) => {
             state.room.link = action.payload
+        })
+        .addCase(setRoomValidation, (state, action) => {
+            state.room.validation = action.payload
         })
         .addCase(setPlayerData, (state, action) => {
             state.player = action.payload

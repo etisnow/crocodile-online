@@ -69,11 +69,26 @@ export class Lobby {
 
     validateName(authKey) {
         const name = this.players[authKey].name
+        if (name.length < 1) {
+            return { error: 'Введите имя' }
+        }
         if (name.length < 3) {
             return { error: 'Имя должно быть не меньше 3х символов' }
         }
         if (name.length > 10) {
             return { error: 'Имя должно не должно быть длиннее 10 символов' }
+        }
+        return { error: '' }
+    }
+
+    validateRoom(roomLink) {
+        const rooms = Object.values(this.rooms)
+        const room = rooms.find((room) => room.link === roomLink)
+        console.log(room.playerIds.length)
+        if (!room) {
+            return { error: 'Такой комнаты нет' }
+        } else if (room.playerIds.length >= this.ROOM_MAX_PLAYERS) {
+            return { error: 'Комната переполнена' }
         }
         return { error: '' }
     }
