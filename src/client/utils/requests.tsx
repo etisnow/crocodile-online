@@ -1,6 +1,6 @@
 import axios from "axios";
 import EventSource from "eventsource";
-import { clearError, RoomValidationStatus, setError, setLoadedName, setMyName, setPlayerData, setRoomData, setRoomLink, setRoomValidation, store } from "../store/store";
+import { clearError, clearRoomValidationError, RoomValidationStatus, setError, setLoadedName, setMyName, setPlayerData, setRoomData, setRoomLink, setRoomValidation, setRoomValidationError, store } from "../store/store";
 
 axios.defaults.baseURL = 'http://localhost:3000'
 axios.defaults.headers.common['Authorization'] = localStorage.getItem('authKey');
@@ -79,13 +79,16 @@ export const enterRoom = () => {
             dispatch(setRoomValidation(RoomValidationStatus.Pending))
             await axios.get(formRoomLink(ENTER_ROOM_URL))
             dispatch(setRoomValidation(RoomValidationStatus.Sucsess))
-            dispatch(clearError())
+            dispatch(clearRoomValidationError())
             console.log('Room Entered');
         } catch (error: any) {
             const response = error.response.data.error
-            console.log(error)
+            console.log(response)
+            if (response === 'Комната не найдена') {
+                dispatch(setError(response))
+            }
             dispatch(setRoomValidation(RoomValidationStatus.Error))
-            //dispatch(setError(response))
+            dispatch(setRoomValidationError(response))
         }
     }
 }

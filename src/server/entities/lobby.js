@@ -84,9 +84,8 @@ export class Lobby {
     validateRoom(roomLink) {
         const rooms = Object.values(this.rooms)
         const room = rooms.find((room) => room.link === roomLink)
-        console.log(room.playerIds.length)
         if (!room) {
-            return { error: 'Такой комнаты нет' }
+            return { error: 'Комната не найдена' }
         } else if (room.playerIds.length >= this.ROOM_MAX_PLAYERS) {
             return { error: 'Комната переполнена' }
         }

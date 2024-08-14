@@ -5,6 +5,7 @@ type State = {
     player: Player,
     room: {
         validation: RoomValidationStatus,
+        validationError: string,
         link: string,
         playerList: RoomPlayer[],
         messages: Message[],
@@ -75,6 +76,8 @@ export const setMyName = createAction<string>('player/setMyName')
 export const setLoadedName = createAction<string>('player/setLoadedName')
 export const setRoomLink = createAction<string>('room/setLink')
 export const setRoomValidation = createAction<RoomValidationStatus>('room/setValidation')
+export const setRoomValidationError = createAction<string>('room/setValidationError')
+export const clearRoomValidationError = createAction('room/clearValidationError')
 
 const initialState: State = {
     player: {
@@ -85,6 +88,7 @@ const initialState: State = {
     },
     room: {
         validation: RoomValidationStatus.Empty,
+        validationError: '',
         link: '',
         playerList: [],
         messages: [],
@@ -126,6 +130,12 @@ const reducer = createReducer(initialState, (builder) => {
         })
         .addCase(setRoomValidation, (state, action) => {
             state.room.validation = action.payload
+        })
+        .addCase(setRoomValidationError, (state, action) => {
+            state.room.validationError = action.payload
+        })
+        .addCase(clearRoomValidationError, (state, action) => {
+            state.room.validationError = ''
         })
         .addCase(setPlayerData, (state, action) => {
             state.player = action.payload

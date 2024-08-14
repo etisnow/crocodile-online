@@ -82,7 +82,7 @@ export class Room {
         if (index > -1) {
             this.playerIds.splice(index, 1)
         }
-        this.addSystemMessage(this.playersDisconected[id].name, 'отсоединился')
+        this.addSystemMessage(this.playersDisconected[id]?.name, 'отсоединился')
 
         if (this.gameState !== GameState.WaintingForPlayers && this.playerIds.length <= 1) {
             this.canelTurn()

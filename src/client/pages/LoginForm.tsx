@@ -48,15 +48,17 @@ function LoginForm() {
         <div className='main-container'>
             <div className='login-container shadowed-block'>
                 <div className="logo"><img src={logo} /><span>Крокодил Онлайн</span></div>
-                <input type='text'
-                    className='name-input'
-                    placeholder='Введите имя'
-                    value={preloadedName || name}
-                    onChange={(e) => inputHandler(e)}
-                    onKeyDown={(e) => loginByEnter(e)}
-                />
-                <button className="login-btn" onClick={() => findGameButtonHandler()}>Найти игру</button>
-                <div className="error-message">{error}</div>
+                <div className="login-form">
+                    <input type='text'
+                        className='name-input'
+                        placeholder='Введите имя'
+                        value={preloadedName || name}
+                        onChange={(e) => inputHandler(e)}
+                        onKeyDown={(e) => loginByEnter(e)}
+                    />
+                    <button className="login-btn" onClick={() => findGameButtonHandler()}>Найти игру</button>
+                    <div className="error-message">{error}</div>
+                </div>
             </div>
             <Console />
         </div>

@@ -12,11 +12,10 @@ function EnterRoom() {
     let preloadedName = useAppSelector((state) => state.player.preloadedName)
     const roomLink = useAppSelector((state) => state.room.link)
     const validationStatus = useAppSelector((state) => state.room.validation)
+    const validationError = useAppSelector((state) => state.room.validationError)
     const [name, setName] = useState(preloadedName)
     const dispatch = useAppDispatch()
     const navigate = useNavigate()
-
-    const error = useAppSelector((state) => state.error)
 
     useEffect(() => {
         dispatch(setRoomLink(''))
@@ -53,7 +52,7 @@ function EnterRoom() {
                 {validationStatus === RoomValidationStatus.Pending ?
                     <Loader />
                     :
-                    <>
+                    <div className="login-form">
                         <input type='text'
                             className='name-input'
                             placeholder='Введите имя'
@@ -62,8 +61,8 @@ function EnterRoom() {
                             onKeyDown={(e) => loginByEnter(e)}
                         />
                         <button className="login-btn" onClick={() => findGameButtonHandler()}>Войти в игру</button>
-                        <div className="error-message">{error}</div>
-                    </>
+                        <div className="error-message">{validationError !== 'Введите имя' && validationError}</div>
+                    </div>
 
                 }
 

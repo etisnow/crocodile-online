@@ -45,7 +45,7 @@ body {
 }
 
 .login-container {
-	height: 300px;
+	height: 310px;
 	width: 430px;
 	padding: 19px 30px;
 	display: flex;
@@ -54,30 +54,48 @@ body {
 	gap: 20px;
 	justify-content: center;
 
-	input[type=text] {
-		width: 260px;
-		border: 2px green solid;
-		font-size: 20px;
-		padding: 5px 8px;
-		font-family: cursive;
-	}
+	.login-form {
+		display: flex;
+		flex-direction: column;
+		justify-content: space-between;
+		align-items: center;
+		min-height: 150px;
 
-	button {
-		width: 260px;
-		background: #40d77c;
-		border: 2px green solid;
-		padding: 5px 0;
-		font-size: 20px;
-		font-family: cursive;
-
-		&:hover {
-			cursor: pointer;
+		input[type=text] {
+			width: 260px;
+			border: 2px green solid;
+			font-size: 20px;
+			padding: 5px 8px;
+			font-family: cursive;
+		}
+	
+		button {
+			width: 260px;
+			background: #40d77c;
+			border: 2px green solid;
+			padding: 5px 0;
+			font-size: 20px;
+			font-family: cursive;
+	
+			&:hover {
+				cursor: pointer;
+			}
+	
+			&:active {
+				box-shadow: 0px 0px 3px 2px rgba(34, 60, 80, 0.37) inset;
+			}
 		}
 
-		&:active {
-			box-shadow: 0px 0px 3px 2px rgba(34, 60, 80, 0.37) inset;
+		.error-message {
+			font-size: 20px;
+			color: #c20000;
+			padding: 2px;
+			min-height: 30px;
+			text-align: center;
 		}
 	}
+
+	
 
 	.logo {
 		display: flex;
@@ -90,14 +108,6 @@ body {
 		img {
 			width: 80px
 		}
-	}
-
-	.error-message {
-		font-size: 20px;
-		color: #c20000;
-		padding: 2px;
-		min-height: 30px;
-		text-align: center;
 	}
 
 }
