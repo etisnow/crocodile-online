@@ -43,10 +43,8 @@ function GameRoom() {
     }, [error])
 
     return (
-        (roomValidation === RoomValidationStatus.Error)
+        (roomValidation === RoomValidationStatus.Sucsess)
             ?
-            <EnterRoom />
-            :
             <div className='main-container'>
                 <div className='game-container'>
                     <Canvas />
@@ -54,6 +52,9 @@ function GameRoom() {
                     <Console />
                 </div>
             </div>
+            :
+            <EnterRoom />
+
     )
 }
 
