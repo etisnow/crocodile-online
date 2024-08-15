@@ -8,7 +8,7 @@ export class Lobby {
     players = {}
     authList = []
 
-    ROOM_MAX_PLAYERS = 2
+    ROOM_MAX_PLAYERS = 4
 
     startNewRoom(hostPlayer) {
         const id = this.roomIds.length

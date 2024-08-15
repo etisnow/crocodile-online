@@ -9,7 +9,7 @@ const Timer = () => {
     const [timer, setTimer] = useState(0)
 
     const minutes = Math.floor(timer / 60 / 1000)
-    const seconds = Math.floor(timer / 1000)
+    const seconds = Math.floor((timer / 1000) % 60)
 
 
     useEffect(() => {

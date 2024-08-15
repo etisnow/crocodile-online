@@ -1,6 +1,8 @@
 import fs from 'fs'
 import { emitter } from "../server.js"
 
+const EMPTY_CANVAS_STRING = 'data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw=='
+
 const GameState = {
     WaintingForPlayers: 'WaintingForPlayers',
     Pending: 'Pending',
@@ -23,14 +25,21 @@ export class Room {
     timer = null
     paintingTimeout = null
     startingTimeout = null
-    canvasData = 'data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw=='
+    canvasData = EMPTY_CANVAS_STRING
 
     constructor(id, link, host) {
         this.id = id
         this.link = link
         this.players[host.id] = host
 
-        this.words = fs.readFileSync('src/server/words.txt', 'utf8').split('\n');
+        this.words = fs.readFileSync('src/server/words.txt', 'utf8')
+            .split('\n')
+            .map((word) => {
+                const trimmed = word.trim()
+                const capitalized = trimmed.charAt(0).toUpperCase() + trimmed.slice(1)
+                return capitalized
+            })
+        this.words.forEach((word) => console.log(word))
 
     }
 
@@ -113,6 +122,10 @@ export class Room {
         this.canvasData = data
     }
 
+    resetCanvasData() {
+        this.canvasData = EMPTY_CANVAS_STRING
+    }
+
     makeEvent(playerId, event, payload) {
         switch (event) {
             case 'message': {
@@ -129,6 +142,7 @@ export class Room {
 
 
     starNewTurn(painterId = this.playerIds[0]) {
+        this.resetCanvasData()
         this.currentPainterId = painterId
         this.gameState = GameState.StartOfTurn
         this.currenctWord = ''
@@ -138,7 +152,7 @@ export class Room {
         this.startingTimeout = setTimeout(() => {
             this.gameState = GameState.Painting
             this.currenctWord = this.words[Math.floor(Math.random() * this.words.length)]
-            this.timer = 20000
+            this.timer = 120000
             this.addSystemMessage('', 'Время пошло!')
             emitter.emit('room-event' + this.link, this.getRoomData())
             this.paintingTimeout = setTimeout(() => {

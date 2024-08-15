@@ -2,8 +2,11 @@ import axios from "axios";
 import EventSource from "eventsource";
 import { clearError, clearRoomValidationError, RoomValidationStatus, setError, setLoadedName, setMyName, setPlayerData, setRoomData, setRoomLink, setRoomValidation, setRoomValidationError, store } from "../store/store";
 
-axios.defaults.baseURL = 'http://localhost:3000'
-axios.defaults.headers.common['Authorization'] = localStorage.getItem('authKey');
+const NGROK_URL = 'https://d094-176-115-144-184.ngrok-free.app'
+
+axios.defaults.baseURL = window.location.href.includes('localhost') ? 'http://localhost:3000' : NGROK_URL
+axios.defaults.headers.common['Authorization'] = localStorage.getItem('authKey')
+axios.defaults.headers.common['ngrok-skip-browser-warning'] = 'true'
 
 type Dispatch = typeof store.dispatch
 
@@ -95,7 +98,10 @@ export const enterRoom = () => {
 
 export const connect = () => {
     const eventSource = new EventSource(formRoomLink(CONNECT_URL), {
-        headers: { 'Authorization': localStorage.getItem('authKey') }
+        headers: {
+            'Authorization': localStorage.getItem('authKey'),
+            'ngrok-skip-browser-warning': 'true'
+        }
     })
     eventSource.onerror = (e: any) => {
         console.log(e)
