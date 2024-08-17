@@ -14,7 +14,9 @@ type State = {
         timerServerStamp: number,
         timer: number,
         gameState: GameState,
-        canvasData: string
+        canvasData: string,
+        roundWinnerId: number,
+        gameWinnerId: number
     },
     error: string
 }
@@ -63,6 +65,8 @@ export const setRoomData = createAction<{
     gameState: GameState,
     currentPainterId: number,
     currentWord: string,
+    roundWinnerId: number,
+    gameWinnerId: number,
     timer: number,
     canvasData: string
 }>('room/setRoomData')
@@ -97,6 +101,8 @@ const initialState: State = {
         timerServerStamp: 0,
         timer: 120,
         gameState: GameState.NotInGame,
+        roundWinnerId: -1,
+        gameWinnerId: -1,
         canvasData: 'data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw=='
     },
     error: ''
@@ -141,7 +147,7 @@ const reducer = createReducer(initialState, (builder) => {
             state.player = action.payload
         })
         .addCase(setRoomData, (state, action) => {
-            const { players, messages, gameState, currentPainterId, currentWord, canvasData, timer } = action.payload
+            const { players, messages, gameState, currentPainterId, currentWord, canvasData, timer, roundWinnerId, gameWinnerId } = action.payload
             state.room.playerList = players
             state.room.messages = messages
             state.room.gameState = gameState
@@ -149,6 +155,8 @@ const reducer = createReducer(initialState, (builder) => {
             state.room.currentWord = currentWord
             state.room.canvasData = canvasData
             state.room.timerServerStamp = timer
+            state.room.roundWinnerId = roundWinnerId
+            state.room.gameWinnerId = gameWinnerId
         })
 })
 

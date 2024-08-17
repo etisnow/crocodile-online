@@ -2,6 +2,7 @@ import fs from 'fs'
 import { emitter } from "../server.js"
 
 const EMPTY_CANVAS_STRING = 'data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw=='
+const SCORE_TO_WIN = 50
 
 const GameState = {
     WaintingForPlayers: 'WaintingForPlayers',
@@ -20,11 +21,14 @@ export class Room {
     gameState = GameState.WaintingForPlayers
     currentPainterId = -1
     painterId = null
+    roundWinnerId = null
+    gameWinnerId = null
     words = []
     currenctWord = ''
     timer = null
     paintingTimeout = null
     startingTimeout = null
+    endingTimeout = null
     canvasData = EMPTY_CANVAS_STRING
 
     constructor(id, link, host) {
@@ -55,6 +59,8 @@ export class Room {
             gameState: this.gameState,
             currentPainterId: this.currentPainterId,
             currentWord: this.currenctWord,
+            roundWinnerId: this.roundWinnerId,
+            gameWinnerId: this.gameWinnerId,
             timer: this.timer,
             canvasData: this.canvasData
         }
@@ -93,8 +99,13 @@ export class Room {
         }
         this.addSystemMessage(this.playersDisconected[id]?.name, 'отсоединился')
 
+        if (this.gameState !== GameState.WaintingForPlayers && this.currentPainterId === id) {
+            this.cancelTurn()
+            this.starNewTurn()
+        }
+
         if (this.gameState !== GameState.WaintingForPlayers && this.playerIds.length <= 1) {
-            this.canelTurn()
+            this.stopGame()
         }
         emitter.emit('room-event' + this.link, this.getRoomData())
     }
@@ -152,31 +163,41 @@ export class Room {
         this.startingTimeout = setTimeout(() => {
             this.gameState = GameState.Painting
             this.currenctWord = this.words[Math.floor(Math.random() * this.words.length)]
-            this.timer = 120000
+            this.timer = 10000
             this.addSystemMessage('', 'Время пошло!')
             emitter.emit('room-event' + this.link, this.getRoomData())
             this.paintingTimeout = setTimeout(() => {
                 this.gameState = GameState.EndOfTurn
+                this.roundWinnerId = -1
                 this.addSystemMessage(`Время закончилось. Никто не угадал слово ${this.currenctWord.toUpperCase()}`)
 
                 const painterIndex = this.playerIds.indexOf(this.currentPainterId)
                 const playersIdExcluded = this.playerIds.slice()
                 playersIdExcluded.splice(painterIndex, 1)
 
-                this.starNewTurn(playersIdExcluded[Math.floor(Math.random() * playersIdExcluded.length)])
+                this.timer = 5000
+                this.startingTimeout = setTimeout(() => {
+                    this.starNewTurn(playersIdExcluded[Math.floor(Math.random() * playersIdExcluded.length)])
+                }, this.timer);
             }, this.timer);
         }, this.timer);
 
 
     }
 
-    canelTurn() {
+    cancelTurn() {
         clearTimeout(this.startingTimeout)
         clearTimeout(this.paintingTimeout)
+        clearTimeout(this.endingTimeout)
         this.currenctWord = ''
         this.currentPainterId = -1
-        this.gameState = GameState.WaintingForPlayers
+        this.gameState = GameState.EndOfTurn
         this.timer = 0
+    }
+
+    stopGame() {
+        this.cancelTurn()
+        this.gameState = GameState.WaintingForPlayers
         this.addSystemMessage('Недостаточно игроков. Игра на паузе')
     }
 
@@ -185,15 +206,34 @@ export class Room {
         guessWord = guessWord.toLowerCase().trim()
         if (propWord === guessWord) {
             clearTimeout(this.paintingTimeout)
-            this.addSystemMessage(this.players[playerId].name, `угадывает слово ${propWord.toUpperCase()}`)
             this.players[playerId].score += 5
             this.players[this.currentPainterId].score += 10
+            this.roundWinnerId = playerId
+            this.addSystemMessage(this.players[playerId].name, `угадывает слово ${propWord.toUpperCase()}`)
+
+            const winner = this.checkWinner()
+            if (winner) return
+
             this.gameState = GameState.EndOfTurn
-            this.starNewTurn(playerId)
+            this.timer = 5000
+            this.endingTimeout = setTimeout(() => {
+                this.starNewTurn(playerId)
+            }, this.timer);
         }
     }
 
+    checkWinner() {
+        const players = Object.values(this.players)
+        const winner = players.find((player) => player.score >= SCORE_TO_WIN)
+        if (winner) {
+            this.addSystemMessage(winner.name, `набирает 100 очков и побеждает`)
+            this.gameWinnerId = winner.id
+            this.gameState = GameState.EndOfGame
+            return true
+        }
 
+        return false
+    }
 
 
 

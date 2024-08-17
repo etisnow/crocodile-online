@@ -2,7 +2,7 @@ import axios from "axios";
 import EventSource from "eventsource";
 import { clearError, clearRoomValidationError, RoomValidationStatus, setError, setLoadedName, setMyName, setPlayerData, setRoomData, setRoomLink, setRoomValidation, setRoomValidationError, store } from "../store/store";
 
-const NGROK_URL = 'https://d094-176-115-144-184.ngrok-free.app'
+const NGROK_URL = 'https://6175-176-115-145-250.ngrok-free.app'
 
 axios.defaults.baseURL = window.location.href.includes('localhost') ? 'http://localhost:3000' : NGROK_URL
 axios.defaults.headers.common['Authorization'] = localStorage.getItem('authKey')
@@ -55,7 +55,7 @@ export const changeName = (name: string) => {
             dispatch(clearError())
         } catch (error: any) {
             const response = error.response.data.error
-            console.log(error, 'error');
+            console.log(response, 'error');
             dispatch(setError('Ошибка авторизации'))
         }
     }

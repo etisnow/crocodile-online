@@ -42,6 +42,26 @@ function GameRoom() {
         }
     }, [error])
 
+    useEffect(() => {
+        function undoHandler(event: KeyboardEvent): void {
+            if ((event.key === '`') || (event.key === 'ё')) {
+                event.preventDefault();
+                const console = document.querySelector('.console');
+                if (console && console instanceof HTMLElement) {
+                    if (console.style.display === "none") {
+                        console.style.display = "block";
+                    } else {
+                        console.style.display = "none";
+                    }
+                }
+            }
+        }
+        document.addEventListener('keydown', undoHandler);
+        return () => {
+            document.removeEventListener('keydown', undoHandler);
+        };
+    }, [])
+
     return (
         (roomValidation === RoomValidationStatus.Sucsess)
             ?
