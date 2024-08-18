@@ -134,6 +134,6 @@ app.get("/connect/:roomLink", (req, res) => {
 });
 
 
-server.listen(PORT, 'localhost', error => {
+server.listen(PORT, '0.0.0.0', error => {
     error ? console.log(error) : console.log(`listening port ${PORT}`)
 })
