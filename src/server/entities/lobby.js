@@ -1,6 +1,6 @@
 import md5 from "js-md5";
 import { Player } from './player.js';
-import { Room } from "./room.js";
+import { GameState, Room } from "./room.js";
 
 export class Lobby {
     rooms = {}
@@ -31,7 +31,10 @@ export class Lobby {
         if (this.roomIds.length === 0) return null
 
         const rooms = Object.values(this.rooms)
-        const room = rooms.find((room) => room.playerIds.length < this.ROOM_MAX_PLAYERS)
+        const room = rooms.find((room) =>
+            (room.playerIds.length < this.ROOM_MAX_PLAYERS) &&
+            (room.gameState !== GameState.EndOfGame)
+        )
         if (room) {
             console.log('room found' + room.id);
             return room.id

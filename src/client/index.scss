@@ -69,22 +69,6 @@ body {
 			font-family: cursive;
 		}
 
-		button {
-			width: 260px;
-			background: #40d77c;
-			border: 2px green solid;
-			padding: 5px 0;
-			font-size: 20px;
-			font-family: cursive;
-
-			&:hover {
-				cursor: pointer;
-			}
-
-			&:active {
-				box-shadow: 0px 0px 3px 2px rgba(34, 60, 80, 0.37) inset;
-			}
-		}
 
 		.error-message {
 			font-size: 20px;
@@ -121,8 +105,10 @@ body {
 		width: 100%;
 		height: 100%;
 		display: flex;
+		flex-direction: column;
 		justify-content: center;
 		align-items: center;
+		gap: 10px;
 		font-size: 24px;
 		font-family: cursive;
 
@@ -150,7 +136,6 @@ body {
 .players-list {
 	padding: 20px 25px;
 	font-family: cursive;
-	color: #ffff28;
 	border-bottom: 1px solid #ffff28;
 	font-size: 25px;
 	display: flex;
@@ -164,7 +149,7 @@ body {
 	padding: 0px 5px;
 
 	&.my-name {
-		color: blue;
+		color: yellow;
 	}
 
 	&.painter {
@@ -208,6 +193,23 @@ body {
 
 	.chat-message-system {
 		color: #0008d2;
+	}
+
+	.chat-message-body {
+
+		&.matched-word {
+			.match-exact {
+				color: green
+			}
+
+			.match-weak {
+				color: #bf6820
+			}
+
+			.match-not {
+				color: black
+			}
+		}
 	}
 }
 

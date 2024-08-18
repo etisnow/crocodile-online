@@ -37,7 +37,9 @@ export interface RoomPlayer {
 export interface Message {
     authorId: number,
     authorName: string,
-    body: string
+    commonText?: string,
+    matchedWord?: Array<{ char: string, match: string }>,
+    systemText?: Array<{ words: string, color: string }>
 }
 
 export enum GameState {

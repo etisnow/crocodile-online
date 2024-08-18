@@ -1,5 +1,7 @@
+import { useNavigate } from "react-router-dom"
 import { selectAmIPainter, selectCurrentPainterName, selectGameWinnerName, selectRoundWinnerName } from "../../store/selectors"
 import { GameState, useAppSelector } from "../../store/store"
+import Button from "../UI/Button/Button"
 
 
 const CanvasInfo = () => {
@@ -11,6 +13,7 @@ const CanvasInfo = () => {
     const currentWord = useAppSelector((state) => state.room.currentWord)
     const roundWinnerName = useAppSelector((state) => selectRoundWinnerName(state))
     const gameWinnerName = useAppSelector((state) => selectGameWinnerName(state))
+    const navigate = useNavigate()
 
     switch (gameState) {
         case GameState.WaintingForPlayers: {
@@ -33,7 +36,17 @@ const CanvasInfo = () => {
             break
         }
         case GameState.EndOfGame: {
-            InfoText = () => <span className='canvas-info-text'>Игра окончена. Победил <span className="special">{gameWinnerName}</span> !</span>
+            InfoText = () =>
+                <>
+                    <div>
+                        <span className='canvas-info-text'>
+                            Игра окончена. Победил <span className="special">{gameWinnerName}</span> !
+                        </span>
+                    </div>
+                    <div>
+                        <Button onClick={() => navigate('/')}>Выйти в меню</Button>
+                    </div>
+                </>
             break
         }
         default:

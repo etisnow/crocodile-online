@@ -1,10 +1,12 @@
 import fs from 'fs'
+import { MessageType } from '../../shared/messageTypes.js'
 import { emitter } from "../server.js"
+import { findMatches, qulifyMessage } from '../utils/text.js'
 
 const EMPTY_CANVAS_STRING = 'data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw=='
-const SCORE_TO_WIN = 50
+const SCORE_TO_WIN = 15
 
-const GameState = {
+export const GameState = {
     WaintingForPlayers: 'WaintingForPlayers',
     Pending: 'Pending',
     StartOfTurn: 'StartOfTurn',
@@ -99,6 +101,10 @@ export class Room {
         }
         this.addSystemMessage(this.playersDisconected[id]?.name, 'отсоединился')
 
+        if (this.gameState === GameState.EndOfGame) {
+            return
+        }
+
         if (this.gameState !== GameState.WaintingForPlayers && this.currentPainterId === id) {
             this.cancelTurn()
             this.starNewTurn()
@@ -111,13 +117,23 @@ export class Room {
     }
 
     addMessage(player, text) {
-        this.messages.push({
-            authorName: player.name,
-            authorId: player.id,
-            body: text
-        })
-        if (this.gameState === GameState.Painting && player.id !== this.currentPainterId) {
-            this.checkWord(player.id, text)
+        const messageType = qulifyMessage(text)
+        if (messageType === MessageType.Common) {
+            this.messages.push({
+                authorName: player.name,
+                authorId: player.id,
+                commonText: text
+            })
+        } else {
+            const matchedWord = findMatches(text, this.currenctWord)
+            this.messages.push({
+                authorName: player.name,
+                authorId: player.id,
+                matchedWord: matchedWord
+            })
+            if (this.gameState === GameState.Painting && player.id !== this.currentPainterId) {
+                this.checkWord(player.id, text)
+            }
         }
     }
     addSystemMessage(textHighlighted, text) {
@@ -163,7 +179,7 @@ export class Room {
         this.startingTimeout = setTimeout(() => {
             this.gameState = GameState.Painting
             this.currenctWord = this.words[Math.floor(Math.random() * this.words.length)]
-            this.timer = 10000
+            this.timer = 120000
             this.addSystemMessage('', 'Время пошло!')
             emitter.emit('room-event' + this.link, this.getRoomData())
             this.paintingTimeout = setTimeout(() => {
