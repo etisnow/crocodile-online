@@ -2,9 +2,9 @@ import axios from "axios";
 import EventSource from "eventsource";
 import { clearError, clearRoomValidationError, RoomValidationStatus, setError, setLoadedName, setMyName, setPlayerData, setRoomData, setRoomLink, setRoomValidation, setRoomValidationError, store } from "../store/store";
 
-const JINO_URL = 'https://6175-176-115-145-250.ngrok-free.app'
+const JINO_URL = 'http://ba5699d52128.vps.myjino.ru:49294'
 
-axios.defaults.baseURL = window.location.href.includes('localhost') ? 'http://ba5699d52128.vps.myjino.ru:49294' : JINO_URL
+axios.defaults.baseURL = window.location.href.includes('localhost') ? 'http://localhost' : JINO_URL
 axios.defaults.headers.common['Authorization'] = localStorage.getItem('authKey')
 axios.defaults.headers.common['ngrok-skip-browser-warning'] = 'true'
 
