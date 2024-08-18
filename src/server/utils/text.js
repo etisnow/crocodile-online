@@ -22,12 +22,6 @@ export const qulifyMessage = (message) => {
         return MessageType.Common
     }
 
-    if (message.split('').some((char) => {
-        return !isLetter(char)
-    })) {
-        return MessageType.Common
-    }
-
     if (!dictionary.includes(message)) {
         return MessageType.Common
     }
