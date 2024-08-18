@@ -22,3 +22,6 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+src/server/assets/all-russian-words.zip
+src/server/assets/russian-mnemonic-words.txt
+src/server/utils/dictionary.js
