@@ -1,10 +1,11 @@
 import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
+import logo from '../assets/icon.png'
 import Console from '../components/console/Console'
+import Button from '../components/UI/Button/Button'
 import { useUpdateEffect } from '../hooks/useUpdateEffect'
 import { setRoomLink, useAppDispatch, useAppSelector } from '../store/store'
 import { changeName, findGame, login } from '../utils/requests'
-import logo from '../assets/icon.png'
 
 
 function LoginForm() {
@@ -56,7 +57,7 @@ function LoginForm() {
                         onChange={(e) => inputHandler(e)}
                         onKeyDown={(e) => loginByEnter(e)}
                     />
-                    <button className="login-btn" onClick={() => findGameButtonHandler()}>Найти игру</button>
+                    <Button onClick={() => findGameButtonHandler()}>Найти игру</Button>
                     <div className="error-message">{error}</div>
                 </div>
             </div>

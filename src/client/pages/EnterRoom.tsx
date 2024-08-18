@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom'
 import logo from '../assets/icon.png'
 import Console from '../components/console/Console'
 import Loader from '../components/login/Loader'
+import Button from '../components/UI/Button/Button'
 import { useUpdateEffect } from '../hooks/useUpdateEffect'
 import { RoomValidationStatus, setRoomLink, useAppDispatch, useAppSelector } from '../store/store'
 import { changeName, enterRoom, findGame, login } from '../utils/requests'
@@ -40,7 +41,7 @@ function EnterRoom() {
         preloadedName = ''
     }
 
-    const findGameButtonHandler = () => {
+    const enterGameButtonHandler = () => {
         dispatch(enterRoom())
     }
 
@@ -60,7 +61,7 @@ function EnterRoom() {
                             onChange={(e) => inputHandler(e)}
                             onKeyDown={(e) => loginByEnter(e)}
                         />
-                        <button className="login-btn" onClick={() => findGameButtonHandler()}>Войти в игру</button>
+                        <Button onClick={() => enterGameButtonHandler()}>Войти в игру</Button>
                         <div className="error-message">{validationError !== 'Введите имя' && validationError}</div>
                     </div>
 

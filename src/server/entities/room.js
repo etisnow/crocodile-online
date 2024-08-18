@@ -1,7 +1,12 @@
 import fs from 'fs'
+import { MessageType } from '../../shared/messageTypes.js'
 import { emitter } from "../server.js"
+import { findMatches, qulifyMessage } from '../utils/text.js'
 
-const GameState = {
+const EMPTY_CANVAS_STRING = 'data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw=='
+const SCORE_TO_WIN = 100
+
+export const GameState = {
     WaintingForPlayers: 'WaintingForPlayers',
     Pending: 'Pending',
     StartOfTurn: 'StartOfTurn',
@@ -18,19 +23,29 @@ export class Room {
     gameState = GameState.WaintingForPlayers
     currentPainterId = -1
     painterId = null
+    roundWinnerId = null
+    gameWinnerId = null
     words = []
     currenctWord = ''
     timer = null
     paintingTimeout = null
     startingTimeout = null
-    canvasData = 'data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw=='
+    endingTimeout = null
+    canvasData = EMPTY_CANVAS_STRING
 
     constructor(id, link, host) {
         this.id = id
         this.link = link
         this.players[host.id] = host
 
-        this.words = fs.readFileSync('src/server/words.txt', 'utf8').split('\n');
+        this.words = fs.readFileSync('src/server/words.txt', 'utf8')
+            .split('\n')
+            .map((word) => {
+                const trimmed = word.trim()
+                const capitalized = trimmed.charAt(0).toUpperCase() + trimmed.slice(1)
+                return capitalized
+            })
+        this.words.forEach((word) => console.log(word))
 
     }
 
@@ -46,6 +61,8 @@ export class Room {
             gameState: this.gameState,
             currentPainterId: this.currentPainterId,
             currentWord: this.currenctWord,
+            roundWinnerId: this.roundWinnerId,
+            gameWinnerId: this.gameWinnerId,
             timer: this.timer,
             canvasData: this.canvasData
         }
@@ -56,14 +73,14 @@ export class Room {
         if (this.playersDisconected[id]) {
             this.players[id] = this.playersDisconected[id]
             delete this.playersDisconected[id]
-            this.addSystemMessage(this.players[id].name, 'вернулся в игру')
+            this.addSystemMessage('PLAYER_RECONNETED', [this.players[id].name])
         } else {
             this.players[player.id] = {
                 id: player.id,
                 name: player.name,
                 score: 0
             }
-            this.addSystemMessage(this.players[id].name, 'присоединился к комнате')
+            this.addSystemMessage('PLAYER_CONNETED', [this.players[id].name])
         }
         this.playerIds.push(id)
 
@@ -82,35 +99,59 @@ export class Room {
         if (index > -1) {
             this.playerIds.splice(index, 1)
         }
-        this.addSystemMessage(this.playersDisconected[id]?.name, 'отсоединился')
+        this.addSystemMessage('PLAYER_DISCONNETED', [this.playersDisconected[id]?.name])
+
+        if (this.gameState === GameState.EndOfGame) {
+            return
+        }
+
+        if (this.gameState !== GameState.WaintingForPlayers && this.currentPainterId === id) {
+            this.cancelTurn()
+            this.starNewTurn()
+        }
 
         if (this.gameState !== GameState.WaintingForPlayers && this.playerIds.length <= 1) {
-            this.canelTurn()
+            this.stopGame()
         }
         emitter.emit('room-event' + this.link, this.getRoomData())
     }
 
     addMessage(player, text) {
-        this.messages.push({
-            authorName: player.name,
-            authorId: player.id,
-            body: text
-        })
-        if (this.gameState === GameState.Painting && player.id !== this.currentPainterId) {
-            this.checkWord(player.id, text)
+        const messageType = qulifyMessage(text)
+        if (messageType === MessageType.Common) {
+            this.messages.push({
+                authorName: player.name,
+                authorId: player.id,
+                commonText: text
+            })
+        } else {
+            const matchedWord = findMatches(text, this.currenctWord)
+            this.messages.push({
+                authorName: player.name,
+                authorId: player.id,
+                matchedWord: matchedWord
+            })
+            if (this.gameState === GameState.Painting && player.id !== this.currentPainterId) {
+                this.checkWord(player.id, text)
+            }
         }
     }
-    addSystemMessage(textHighlighted, text) {
+    addSystemMessage(systemMessageType = '', systemMessagePayload = []) {
         this.messages.push({
-            authorName: textHighlighted,
+            authorName: 'system',
             authorId: -1,
-            body: text
+            systemMessageType,
+            systemMessagePayload
         })
         emitter.emit('room-event' + this.link, this.getRoomData())
     }
 
     setCavnasData(data) {
         this.canvasData = data
+    }
+
+    resetCanvasData() {
+        this.canvasData = EMPTY_CANVAS_STRING
     }
 
     makeEvent(playerId, event, payload) {
@@ -129,41 +170,52 @@ export class Room {
 
 
     starNewTurn(painterId = this.playerIds[0]) {
+        this.resetCanvasData()
         this.currentPainterId = painterId
         this.gameState = GameState.StartOfTurn
         this.currenctWord = ''
         this.timer = 5000
-        this.addSystemMessage(this.players[painterId].name, 'становится ведущим')
+        this.addSystemMessage('PLAYER_PAINTER', [this.players[painterId].name])
 
         this.startingTimeout = setTimeout(() => {
             this.gameState = GameState.Painting
             this.currenctWord = this.words[Math.floor(Math.random() * this.words.length)]
-            this.timer = 20000
-            this.addSystemMessage('', 'Время пошло!')
+            this.timer = 120000
+            this.addSystemMessage('ROUND_BEGIN')
             emitter.emit('room-event' + this.link, this.getRoomData())
             this.paintingTimeout = setTimeout(() => {
                 this.gameState = GameState.EndOfTurn
-                this.addSystemMessage(`Время закончилось. Никто не угадал слово ${this.currenctWord.toUpperCase()}`)
+                this.roundWinnerId = -1
+                this.addSystemMessage('TIME_ENDED', [this.currenctWord.toUpperCase()])
 
                 const painterIndex = this.playerIds.indexOf(this.currentPainterId)
                 const playersIdExcluded = this.playerIds.slice()
                 playersIdExcluded.splice(painterIndex, 1)
 
-                this.starNewTurn(playersIdExcluded[Math.floor(Math.random() * playersIdExcluded.length)])
+                this.timer = 5000
+                this.startingTimeout = setTimeout(() => {
+                    this.starNewTurn(playersIdExcluded[Math.floor(Math.random() * playersIdExcluded.length)])
+                }, this.timer);
             }, this.timer);
         }, this.timer);
 
 
     }
 
-    canelTurn() {
+    cancelTurn() {
         clearTimeout(this.startingTimeout)
         clearTimeout(this.paintingTimeout)
+        clearTimeout(this.endingTimeout)
         this.currenctWord = ''
         this.currentPainterId = -1
-        this.gameState = GameState.WaintingForPlayers
+        this.gameState = GameState.EndOfTurn
         this.timer = 0
-        this.addSystemMessage('Недостаточно игроков. Игра на паузе')
+    }
+
+    stopGame() {
+        this.cancelTurn()
+        this.gameState = GameState.WaintingForPlayers
+        this.addSystemMessage('NOT_ENOUGH_PLAYERS')
     }
 
     checkWord(playerId, guessWord) {
@@ -171,15 +223,34 @@ export class Room {
         guessWord = guessWord.toLowerCase().trim()
         if (propWord === guessWord) {
             clearTimeout(this.paintingTimeout)
-            this.addSystemMessage(this.players[playerId].name, `угадывает слово ${propWord.toUpperCase()}`)
             this.players[playerId].score += 5
             this.players[this.currentPainterId].score += 10
+            this.roundWinnerId = playerId
+            this.addSystemMessage('PLAYER_GUESSED_WORD', [this.players[playerId].name, propWord.toUpperCase()])
+
+            const winner = this.checkWinner()
+            if (winner) return
+
             this.gameState = GameState.EndOfTurn
-            this.starNewTurn(playerId)
+            this.timer = 5000
+            this.endingTimeout = setTimeout(() => {
+                this.starNewTurn(playerId)
+            }, this.timer);
         }
     }
 
+    checkWinner() {
+        const players = Object.values(this.players)
+        const winner = players.find((player) => player.score >= SCORE_TO_WIN)
+        if (winner) {
+            this.addSystemMessage('PLAYER_WON', [winner.name], SCORE_TO_WIN)
+            this.gameWinnerId = winner.id
+            this.gameState = GameState.EndOfGame
+            return true
+        }
 
+        return false
+    }
 
 
 

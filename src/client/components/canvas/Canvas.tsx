@@ -1,16 +1,21 @@
 import React from 'react';
+import { selectAmIPainter, selectIsPainting } from '../../store/selectors';
 import { useAppSelector } from '../../store/store';
-import { selectAmIPainter } from '../../store/selectors';
-import CanvasPainter from './CanvasPainter';
 import CanvasGuesser from './CanvasGuesser';
+import CanvasInfo from './CanvasInfo';
+import CanvasPainter from './CanvasPainter';
 
 
 const Canvas: React.FC = () => {
     const amIPainter = useAppSelector((state) => selectAmIPainter(state))
-
+    const isPainting = useAppSelector((state) => selectIsPainting(state))
     return (
         <>
-            {amIPainter ? <CanvasPainter /> : <CanvasGuesser />}
+            {
+                isPainting
+                    ? amIPainter ? <CanvasPainter /> : <CanvasGuesser />
+                    : <CanvasInfo />
+            }
         </>
     );
 };
