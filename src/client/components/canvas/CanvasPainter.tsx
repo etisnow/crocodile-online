@@ -55,22 +55,23 @@ const CanvasPainter: React.FC = () => {
 
 
     useEffect(() => {
-        const canvas = canvasRef.current;
+        const canvas = canvasRef.current
         if (canvas) {
             const context = canvas.getContext('2d');
             if (context) {
                 context.clearRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT)
-                context.lineCap = 'round';
+                context.lineCap = 'round'
+                context.lineJoin = 'round'
 
                 // Отрисовка линий из состояния
                 lines.forEach(line => {
                     context.beginPath();
-                    context.strokeStyle = line[0].color;
+                    context.strokeStyle = line[0].color
                     const thicknessValue = line[0].thickness
-                    context.lineWidth = Thickness[thicknessValue];
-                    context.moveTo(line[0].x, line[0].y);
+                    context.lineWidth = Thickness[thicknessValue]
+                    context.moveTo(line[0].x, line[0].y)
                     for (let i = 1; i < line.length; i++) {
-                        context.lineTo(line[i].x, line[i].y);
+                        context.lineTo(line[i].x, line[i].y)
                     }
                     context.stroke();
                 });

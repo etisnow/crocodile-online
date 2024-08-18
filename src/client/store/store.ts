@@ -36,10 +36,11 @@ export interface RoomPlayer {
 
 export interface Message {
     authorId: number,
-    authorName: string,
+    authorName?: string,
     commonText?: string,
     matchedWord?: Array<{ char: string, match: string }>,
-    systemText?: Array<{ words: string, color: string }>
+    systemMessageType?: string,
+    systemMessagePayload?: Array<string>
 }
 
 export enum GameState {
