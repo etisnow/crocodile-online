@@ -10,11 +10,14 @@ const PlayerDashboard: React.FC = () => {
     return (
         <div className='players-list'>
             {playerListSorted.map((player) =>
-                <div className={
-                    `player-node 
-                    ${(myId === player.id) ? 'my-name' : ''} 
-                    ${(currentPainerId === player.id) ? 'painter' : ''}`
-                }>
+                <div
+                    className={
+                        `player-node 
+                        ${(myId === player.id) ? 'my-name' : ''} 
+                        ${(currentPainerId === player.id) ? 'painter' : ''}`
+                    }
+                    key={player.id}
+                >
                     <span className='player-name'>{player.name}</span>
                     <span className='player-score'>{player.score.toString()}</span>
                 </div>

@@ -3,7 +3,6 @@ import { changeGameStateAction, GameState, useAppDispatch, useAppSelector } from
 
 const Console = () => {
     const dispatch = useAppDispatch()
-    const playerList = useAppSelector((state) => state.room.playerList)
     const amIPainter = useAppSelector((state) => selectAmIPainter(state))
     const myId = useAppSelector((state) => state.player.id)
     const gameState = useAppSelector(state => state.room.gameState)

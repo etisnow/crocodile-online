@@ -1,11 +1,8 @@
 import { useEffect, useState } from "react"
-import { useAppDispatch, useAppSelector } from "../../store/store"
+import { useAppSelector } from "../../store/store"
 
 const Timer = () => {
-    const dispatch = useAppDispatch()
-    // const timer = useAppSelector((state) => state.room.timer)
     const timerServerStamp = useAppSelector((state) => state.room.timerServerStamp)
-    const gameState = useAppSelector((state) => state.room.gameState)
     const [timer, setTimer] = useState(0)
 
     const minutes = Math.floor(timer / 60 / 1000)

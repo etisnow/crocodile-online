@@ -1,7 +1,8 @@
 import fs from 'fs';
 import { MessageType } from "../../shared/messageTypes.js";
 
-const dictionary = fs.readFileSync('src/server/assets/russian-nouns.txt', 'utf8')
+const dictionary = fs.readFileSync('src/server/assets/words-russian-nouns.txt', 'utf8')
+const dictionarySet = new Set(dictionary.split('\n').map((word) => word.trim()))
 
 const isLetter = (char) => {
     if (char.toUpperCase() !== char.toLowerCase()) {
@@ -10,7 +11,7 @@ const isLetter = (char) => {
     return false
 }
 
-export const qulifyMessage = (message) => {
+export const qualifyMessage = (message) => {
     message.trim()
 
     if (message.length > 20) {
@@ -22,7 +23,7 @@ export const qulifyMessage = (message) => {
         return MessageType.Common
     }
 
-    if (!dictionary.includes(message)) {
+    if (!dictionarySet.has(message)) {
         return MessageType.Common
     }
 
@@ -65,3 +66,16 @@ export const findMatches = (word, target) => {
 
     return highlightedWord
 }
+
+// const text = 'ячмень'
+// const target = 'пробник'
+// console.time('test')
+// qualifyMessage(text)
+// console.timeEnd('test')
+
+// const mySet = new Set(dictionary.split('\n').map((word) => word.trim()))
+
+// const check = () => mySet.has(text)
+// console.time('test2')
+// check()
+// console.timeEnd('test2')

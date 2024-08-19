@@ -33,15 +33,6 @@ const Chat = () => {
         }, 500);
     }
 
-    const addMessage = (text: string) => {
-        if (!text) return
-        if (myPlayerData.id !== null) {
-            setInputValue('')
-            inputRef.current?.focus()
-            dispatch(sendMessage(text))
-        }
-    }
-
     const handleInputOnChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         if (e.target.value.length <= MAX_MESSAGE_LENGTH) {
             setInputValue(e.target.value)
@@ -57,7 +48,7 @@ const Chat = () => {
     const messageOutput = messageList.map((message, i) => {
         if (message.systemMessageType && message.systemMessagePayload) {
             return (
-                <SystemMessage i={i} type={message.systemMessageType} payload={message.systemMessagePayload} />
+                <SystemMessage key={i} i={i} type={message.systemMessageType} payload={message.systemMessagePayload} />
             )
         } else if (message.commonText) {
             return (
@@ -70,12 +61,12 @@ const Chat = () => {
             return (
                 <div className="chat-message" key={i}>
                     <span className="chat-message-author">{message.authorName}: </span>
-                    <span className="chat-message-body matched-word">{message.matchedWord.map((element) => {
+                    <span className="chat-message-body matched-word">{message.matchedWord.map((element, i) => {
                         let matchClass = ''
                         if (element.match === 'exact') matchClass = 'match-exact'
                         else if (element.match === 'weak') matchClass = 'match-weak'
                         else matchClass = 'match-not'
-                        return <span className={matchClass}>{element.char}</span>
+                        return <span key={i} className={matchClass}>{element.char}</span>
                     }
 
                     )}</span>

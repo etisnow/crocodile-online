@@ -1,7 +1,7 @@
 import fs from 'fs'
 import { MessageType } from '../../shared/messageTypes.js'
 import { emitter } from "../server.js"
-import { findMatches, qulifyMessage } from '../utils/text.js'
+import { findMatches, qualifyMessage } from '../utils/text.js'
 
 const EMPTY_CANVAS_STRING = 'data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw=='
 const SCORE_TO_WIN = 100
@@ -43,10 +43,10 @@ export class Room {
             .map((word) => {
                 const trimmed = word.trim()
                 const capitalized = trimmed.charAt(0).toUpperCase() + trimmed.slice(1)
-                return capitalized
+                if (!capitalized.includes(' ')) {
+                    return capitalized
+                }
             })
-        this.words.forEach((word) => console.log(word))
-
     }
 
     toJSON() {
@@ -117,7 +117,7 @@ export class Room {
     }
 
     addMessage(player, text) {
-        const messageType = qulifyMessage(text)
+        const messageType = qualifyMessage(text)
         if (messageType === MessageType.Common) {
             this.messages.push({
                 authorName: player.name,
@@ -136,6 +136,7 @@ export class Room {
             }
         }
     }
+
     addSystemMessage(systemMessageType = '', systemMessagePayload = []) {
         this.messages.push({
             authorName: 'system',

@@ -1,0 +1,7 @@
+{
+    "verbose": true,
+    "execMap": {
+        "server": "npm run server",
+        "static": "serve ./dist -p 80"
+    }
+}

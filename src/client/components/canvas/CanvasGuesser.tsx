@@ -1,12 +1,10 @@
 import React from 'react';
 
-
-import CanvasHeader from './CanvasHeader';
 import { useAppSelector } from '../../store/store';
-import { selectCanvasData } from '../../store/selectors';
+import CanvasHeader from './CanvasHeader';
 
 const CanvasGuesser: React.FC = () => {
-    const canvasData = useAppSelector(selectCanvasData)
+    const canvasData = useAppSelector((state) => state.room.canvasData)
 
     return (
         <div className='canvas-container shadowed-block'>

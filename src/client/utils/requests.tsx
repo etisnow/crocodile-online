@@ -4,7 +4,7 @@ import { clearError, clearRoomValidationError, RoomValidationStatus, setError, s
 
 const JINO_URL = 'http://ba5699d52128.vps.myjino.ru:49294'
 
-axios.defaults.baseURL = window.location.href.includes('localhost') ? 'http://localhost' : JINO_URL
+axios.defaults.baseURL = window.location.href.includes('localhost') ? 'http://localhost:3000' : JINO_URL
 axios.defaults.headers.common['Authorization'] = localStorage.getItem('authKey')
 axios.defaults.headers.common['ngrok-skip-browser-warning'] = 'true'
 
@@ -83,7 +83,6 @@ export const enterRoom = () => {
             await axios.get(formRoomLink(ENTER_ROOM_URL))
             dispatch(setRoomValidation(RoomValidationStatus.Sucsess))
             dispatch(clearRoomValidationError())
-            console.log('Room Entered');
         } catch (error: any) {
             const response = error.response.data.error
             console.log(response)

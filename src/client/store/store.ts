@@ -122,7 +122,7 @@ const reducer = createReducer(initialState, (builder) => {
         .addCase(setError, (state, action) => {
             state.error = action.payload
         })
-        .addCase(clearError, (state, action) => {
+        .addCase(clearError, (state) => {
             state.error = ''
         })
         .addCase(setMyId, (state, action) => {
@@ -143,7 +143,7 @@ const reducer = createReducer(initialState, (builder) => {
         .addCase(setRoomValidationError, (state, action) => {
             state.room.validationError = action.payload
         })
-        .addCase(clearRoomValidationError, (state, action) => {
+        .addCase(clearRoomValidationError, (state) => {
             state.room.validationError = ''
         })
         .addCase(setPlayerData, (state, action) => {

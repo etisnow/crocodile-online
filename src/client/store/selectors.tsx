@@ -8,11 +8,6 @@ export const selectAmIPainter = createAppSelector(
     (myId, state) => myId === state
 )
 
-export const selectCanvasData = createAppSelector(
-    [(state) => state.room.canvasData],
-    (canvasData) => canvasData
-)
-
 export const selectInGame = createAppSelector(
     [(state) => state.room.link],
     (link) => link != ''
