@@ -1,4 +1,5 @@
 import { useAppSelector } from "../../store/store"
+import PlayerName from '../UI/Player/PlayerName'
 
 const PlayerDashboard: React.FC = () => {
     const playerList = useAppSelector((state) => state.room.playerList)
@@ -18,7 +19,8 @@ const PlayerDashboard: React.FC = () => {
                     }
                     key={player.id}
                 >
-                    <span className='player-name'>{player.name}</span>
+
+                    <PlayerName name={player.name} avatar={player.avatar}></PlayerName>
                     <span className='player-score'>{player.score.toString()}</span>
                 </div>
             )}

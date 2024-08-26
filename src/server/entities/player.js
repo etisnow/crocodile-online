@@ -6,6 +6,7 @@ export class Player {
     constructor(id, name, roomId = null) {
         this.id = id
         this.name = name
+        this.avatar = Math.ceil(Math.random() * 16)
         this.isActive = true
         console.log('new player constructed');
     }
@@ -20,8 +21,8 @@ export class Player {
     }
 
     toJSON() {
-        const { id, name, score } = this
-        return { id, name, score }
+        const { id, name, score, avatar } = this
+        return { id, name, score, avatar }
     }
 
 }

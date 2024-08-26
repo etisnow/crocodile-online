@@ -48,7 +48,10 @@ function LoginForm() {
 
         <div className='main-container'>
             <div className='login-container shadowed-block'>
-                <div className="logo"><img src={logo} /><span>Крокодил Онлайн</span></div>
+                <div className="logo">
+                    <img src={logo} />
+                    <span style={{ color: '#428f6c' }}>Croco</span>
+                    <span style={{ color: '#FF6868' }}>Draw</span></div>
                 <div className="login-form">
                     <input type='text'
                         className='name-input'

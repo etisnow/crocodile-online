@@ -11,7 +11,7 @@ const CanvasGuesser: React.FC = () => {
             <CanvasHeader />
             <img src={canvasData} width='800px' height='705px' />
         </div>
-    );
-};
+    )
+}
 
 export default CanvasGuesser;

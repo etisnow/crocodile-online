@@ -38,19 +38,19 @@ const SystemMessage: React.FC<ISystemMessage> = ({ i, type, payload }) => {
             break
         }
         case SystemMessageType.ROUND_BEGIN: {
-            Text = () => <span><span className="yellow">Время пошло!</span></span>
+            Text = () => <span>Время пошло!</span>
             break
         }
         case SystemMessageType.TIME_ENDED: {
-            Text = () => <span><span className="red">Время вышло</span>. Никто не угадал слово <span className="yellow">{payload[0]}</span></span>
+            Text = () => <span>Время вышло. Никто не угадал слово <span className="red">{payload[0]}</span></span>
             break
         }
         case SystemMessageType.NOT_ENOUGH_PLAYERS: {
-            Text = () => <span><span className="red">Недостаточно игроков</span>. Игра поставлена на <span className="yellow">паузу</span></span>
+            Text = () => <span>Недостаточно игроков. Игра поставлена на <span className="yellow">паузу</span></span>
             break
         }
         case SystemMessageType.PLAYER_GUESSED_WORD: {
-            Text = () => <span>Игрок <span className="yellow">{payload[0]}</span> угадал слово <span className="yellow">{payload[1]}</span></span>
+            Text = () => <span>Игрок <span className="yellow">{payload[0]}</span> угадал слово <span className="red">{payload[1]}</span></span>
             break
         }
         case SystemMessageType.PLAYER_WON: {

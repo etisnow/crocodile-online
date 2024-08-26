@@ -49,7 +49,11 @@ function EnterRoom() {
 
         <div className='main-container'>
             <div className='login-container shadowed-block'>
-                <div className="logo"><img src={logo} /><span>Крокодил Онлайн</span></div>
+                <div className="logo">
+                    <img src={logo} />
+                    <span style={{ color: '#428f6c' }}>Croco</span>
+                    <span style={{ color: '#FF6868' }}>Draw</span>
+                </div>
                 {validationStatus === RoomValidationStatus.Pending ?
                     <Loader />
                     :

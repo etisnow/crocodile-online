@@ -25,3 +25,8 @@ dist-ssr
 src/server/assets/all-russian-words.zip
 src/server/assets/russian-mnemonic-words.txt
 src/server/utils/dictionary.js
+src/client/assets/avatars/variety-animal-avatars/5.ai
+src/client/assets/avatars/variety-animal-avatars/5.eps
+src/client/assets/avatars/variety-animal-avatars/License free.txt
+src/client/assets/avatars/variety-animal-avatars/License premium.txt
+src/client/assets/avatars/variety-animal-avatars/preview.jpg

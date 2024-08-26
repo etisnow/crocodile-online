@@ -31,7 +31,8 @@ export interface Player {
 export interface RoomPlayer {
     id: number,
     name: string,
-    score: number
+    score: number,
+    avatar: number
 }
 
 export interface Message {

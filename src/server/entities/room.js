@@ -78,7 +78,8 @@ export class Room {
             this.players[player.id] = {
                 id: player.id,
                 name: player.name,
-                score: 0
+                score: 0,
+                avatar: player.avatar
             }
             this.addSystemMessage('PLAYER_CONNETED', [this.players[id].name])
         }
@@ -176,7 +177,7 @@ export class Room {
         this.gameState = GameState.StartOfTurn
         this.currenctWord = ''
         this.timer = 5000
-        this.addSystemMessage('PLAYER_PAINTER', [this.players[painterId].name])
+        this.addSystemMessage('PLAYER_PAINTER', [this.players[painterId]?.name])
 
         this.startingTimeout = setTimeout(() => {
             this.gameState = GameState.Painting

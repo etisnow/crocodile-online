@@ -1,3 +1,8 @@
+@font-face {
+	font-family: 'CustomFont';
+	src: url("assets/fonts/AreYouSerious-Regular.ttf") format('opentype');
+}
+
 * {
 	box-sizing: border-box;
 }
@@ -20,8 +25,12 @@ body {
 	margin: 0;
 	height: 100vh;
 	width: 100vw;
-	background-image: url('assets/paintings.jpg');
-	background-size: cover;
+	//background-image: radial-gradient(circle at 50% 50%, #BEDC74 0%, #387F39 100%), url('assets/pattern2.png');
+	//background-image: url("assets/pattern2.png"), linear-gradient(#eb01a5, #d13531);
+	background:
+		radial-gradient(circle at 50% 50%, rgba(190, 220, 116, 0.9) 0%, rgba(56, 127, 57, 0.9) 100%),
+		url("assets/pattern.svg") repeat;
+	opacity: 1;
 }
 
 .main-container {
@@ -38,10 +47,11 @@ body {
 }
 
 .shadowed-block {
-	background: rgba(255, 255, 255, 0.4);
+	background: linear-gradient(180deg, #FFEAA7, #ffbf70);
 	-webkit-box-shadow: 0px 0px 9px 6px rgba(34, 60, 80, 0.56);
 	-moz-box-shadow: 0px 0px 9px 6px rgba(34, 60, 80, 0.56);
 	box-shadow: 0px 0px 9px 6px rgba(34, 60, 80, 0.56);
+	border-radius: 10px;
 }
 
 .login-container {
@@ -53,6 +63,7 @@ body {
 	align-items: center;
 	gap: 20px;
 	justify-content: center;
+	border-radius: 30px;
 
 	.login-form {
 		display: flex;
@@ -66,7 +77,7 @@ body {
 			border: 2px green solid;
 			font-size: 20px;
 			padding: 5px 8px;
-			font-family: cursive;
+			font-family: system-ui;
 		}
 
 
@@ -84,13 +95,17 @@ body {
 	.logo {
 		display: flex;
 		align-items: center;
-		font-size: 28px;
 		gap: 10px;
-		font-family: cursive;
+		font-family: system-ui;
 		margin-bottom: 25px;
 
 		img {
 			width: 80px
+		}
+
+		span {
+			font-family: 'CustomFont';
+			font-size: 50px;
 		}
 	}
 
@@ -110,7 +125,7 @@ body {
 		align-items: center;
 		gap: 10px;
 		font-size: 24px;
-		font-family: cursive;
+		font-family: system-ui;
 
 		.canvas-info-text {
 			background-color: rgba(255, 92, 92, 0.49);
@@ -126,7 +141,7 @@ body {
 .side-panel {
 	width: 300px;
 	height: 800px;
-	background: rgb(99 195 202 / 78%);
+	background: rgba(15, 148, 71, 0.6);
 	display: flex;
 	flex-direction: column;
 	justify-content: space-between;
@@ -135,9 +150,9 @@ body {
 
 .players-list {
 	padding: 20px 25px;
-	font-family: cursive;
+	font-family: system-ui;
 	border-bottom: 1px solid #ffff28;
-	font-size: 25px;
+	font-size: 24px;
 	display: flex;
 	flex-direction: column;
 	gap: 5px;
@@ -147,18 +162,29 @@ body {
 	display: flex;
 	justify-content: space-between;
 	padding: 0px 5px;
+	color: white;
 
 	&.my-name {
 		color: yellow;
 	}
 
 	&.painter {
-		background: rgba(255, 92, 92, 0.49);
+		background: #ffff00a1;
+		color: black;
+	}
+
+	.player-name {
+		display: flex;
+		gap: 10px;
+
+		img {
+			width: 35px;
+		}
 	}
 }
 
 .chat-container {
-	font-family: cursive;
+	font-family: system-ui;
 	font-size: 18px;
 	display: flex;
 	flex-direction: column;
@@ -179,7 +205,7 @@ body {
 	}
 
 	&::-webkit-scrollbar-track {
-		background-color: rgba(99, 195, 202, 0.78);
+		background-color: rgba(52, 155, 36, 0.78);
 
 	}
 
@@ -188,30 +214,48 @@ body {
 	}
 
 	.chat-message-system {
-		color: #0008d2;
+		color: white;
 
 		.yellow {
 			color: yellow
 		}
 
 		.red {
-			color: #a30000
+			background: #ff6363;
 		}
+	}
+
+	.chat-message-author {
+		color: yellow;
 	}
 
 	.chat-message-body {
 
 		&.matched-word {
 			.match-exact {
-				color: green
+				color: black;
+				background: rgb(0, 255, 0, 0.6);
+				display: inline-block;
+				width: 18px;
+				border: 1px black solid;
+				text-align: center;
 			}
 
 			.match-weak {
-				color: #bf6820
+				background: rgba(255, 137, 39, 0.8);
+				display: inline-block;
+				width: 18px;
+				border: 1px black solid;
+				text-align: center;
 			}
 
 			.match-not {
-				color: black
+				color: black;
+				background: rgb(255, 255, 255, 0.6);
+				display: inline-block;
+				width: 18px;
+				border: 1px black solid;
+				text-align: center;
 			}
 		}
 	}
@@ -238,6 +282,12 @@ body {
 .chat-form-btn {
 	border: none;
 	font-size: 20px;
+	background: #ffce6c;
+
+	&:hover {
+		background: #ffd277;
+		cursor: pointer;
+	}
 
 	&:active {
 		-webkit-box-shadow: 0px 0px 2px 3px rgba(9, 10, 11, 0.2) inset;
@@ -250,17 +300,27 @@ body {
 	display: flex;
 	justify-content: space-between;
 	padding: 10px 20px 0 20px;
-	font-family: cursive;
+	font-family: system-ui;
 	font-size: 25px;
+
+	* {
+		width: 33%;
+	}
+
+	.canvas-timer {
+		text-align: right;
+	}
 }
 
 .canvas-word-info {
 	letter-spacing: 4px;
+	text-align: center;
 
 	span {
 		padding: 0px 5px;
 		background: rgb(255 92 92 / 49%);
 	}
+
 }
 
 .canvas-footer {

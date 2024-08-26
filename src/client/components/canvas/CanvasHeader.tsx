@@ -1,5 +1,6 @@
 import { selectAmIPainter } from "../../store/selectors"
-import { GameState, useAppSelector } from "../../store/store"
+import { useAppSelector } from "../../store/store"
+import PlayerName from "../UI/Player/PlayerName"
 import Timer from "./Timer"
 
 const CanvasHeader = () => {
@@ -13,11 +14,7 @@ const CanvasHeader = () => {
     return (
         <div className="canvas-header">
             <div className="canvas-painter-info">
-                <span className='canvas-painter-name'>
-                    {gameState === GameState.WaintingForPlayers
-                        ? 'Ожидание других игроков..'
-                        : currentPlayer?.name
-                    }</span>
+                <PlayerName name={currentPlayer?.name} avatar={currentPlayer?.avatar}></PlayerName>
             </div>
             <div className="canvas-word-info">
                 {currentWord && amIPainter && <span>{currentWord}</span>}
